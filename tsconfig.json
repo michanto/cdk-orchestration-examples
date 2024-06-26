@@ -12,7 +12,7 @@
     "lib": [
       "es2019"
     ],
-    "module": "CommonJS",
+    "module": "nodenext",
     "noEmitOnError": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -25,7 +25,8 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "moduleResolution": "nodenext"
   },
   "include": [
     "src/**/*.ts"

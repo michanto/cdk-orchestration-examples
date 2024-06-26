@@ -1,4 +1,5 @@
-import { CfnElementUtilities, Logger, transforms } from '@michanto/cdk-orchestration';
+import { Log, Logger } from '@michanto/cdk-orchestration';
+import { CfTemplateType, Transform } from '@michanto/cdk-orchestration/transforms';
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import { DefinitionBody, StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
@@ -6,15 +7,22 @@ import { GreetingLambdaTask } from './constructs/greeting_lambda_task';
 import { HitlTestStepFunctionDefinition } from './constructs/hitl_test_step_fn';
 import { PyStepFunctionsImport } from './constructs/py_step_functions_cleanup';
 
-export class EchoResolved extends transforms.Transform {
-  constructor(scope: Construct, id: string, readonly resourceId: string) {
+// TODO:  Just use Echo.
+export class EchoResource extends Transform {
+  constructor(scope: Construct, id: string, readonly logicalId: string) {
     super(scope, id);
+    Logger.set(this, new Logger());
   }
 
-  apply(template: transforms.CfTemplateType): transforms.CfTemplateType {
-    let res = template.Resources[this.resourceId];
+  get shimParent(): Construct {
+    return Stack.of(this);
+  }
+
+  apply(template: CfTemplateType): CfTemplateType {
+    let logicalId = Stack.of(this).resolve(this.logicalId);
+    let res = template.Resources[logicalId];
     if (res) {
-      console.log(JSON.stringify(res, undefined, 2));
+      Log.of(this).info(`'${logicalId}':` + JSON.stringify(res, undefined, 2));
     }
     return template;
   }
@@ -23,7 +31,6 @@ export class EchoResolved extends transforms.Transform {
 export class FindingConstructs01 extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
-    Logger.set(this, new Logger());
 
     const succeedStepFunction = new HitlTestStepFunctionDefinition(this, 'HitlStepFunction', {
       successMode: true,
@@ -37,17 +44,19 @@ export class FindingConstructs01 extends Stack {
 
     new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
 
+    /* * /
     let resources = new CfnElementUtilities().cfnResources(this);
     console.log(`${resources.length} resources.`);
     console.log(resources.map(x => `${x.node.path} (${x.cfnResourceType})`));
 
-    /*
+    /* * /
     let lambdaTask = resources.filter(x => x.cfnResourceType == 'Custom::LambdaTask').pop()!;
-    (new transforms.Echo(lambdaTask, 'Echo'), new Logger());
-    */
-    /*
-    new EchoResolved(this, 'EchoResolved', 'GreetingLambdaTask6113D194');
-    */
+    // TODO: Use Echo.
+    new EchoResource(lambdaTask, 'Echo', lambdaTask.logicalId);
+    /**/
+    /** /
+    new RemoveSalt(lambdaTask);
+    /**/
   }
 }
 
@@ -59,7 +68,7 @@ const devEnv = {
 
 const app = new App();
 
-new FindingConstructs01(app, 'cdk-orchestration-examples-dev', { env: devEnv });
-// new MyStack(app, 'cdk-orchestration-examples-prod', { env: prodEnv });
+new FindingConstructs01(app, 'cdk-orch-finding-constructs-dev', { env: devEnv });
+// new FindingConstructs01(app, 'cdk-orch-finding-constructs-prod', { env: prodEnv });
 
 app.synth();

@@ -1,11 +1,12 @@
-import { cloudformation_include, transforms } from '@michanto/cdk-orchestration';
+import { TemplateImporter } from '@michanto/cdk-orchestration/cloudformation-include';
+import { CfTemplateType, StringReplacer, Transform } from '@michanto/cdk-orchestration/transforms';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { IRole, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnStateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
 
-export class DescriptionRemover extends transforms.Transform {
-  public apply(template: transforms.CfTemplateType): transforms.CfTemplateType {
+export class DescriptionRemover extends Transform {
+  public apply(template: CfTemplateType): CfTemplateType {
     delete template.Description;
     return template;
   }
@@ -27,7 +28,7 @@ export interface PyStepFunctionsCleanupProps {
  * https://docs.aws.amazon.com/step-functions/latest/dg/concepts-python-sdk.html)
  * and modifies it for import into a CDK stack.
  */
-export class PyStepFunctionsCleanup extends transforms.Transform {
+export class PyStepFunctionsCleanup extends Transform {
   /** Default name for StepFunction created by Python SDK. */
   static readonly STATE_MACHINE_RESOURCE_ID = 'StateMachineComponent';
 
@@ -41,7 +42,7 @@ export class PyStepFunctionsCleanup extends transforms.Transform {
     if (props?.resourceLogicalId) {
       // Note that StringTransforms always run before Transforms,
       // unless the StringTransform.order is overridden.
-      new transforms.StringReplacer(scope, 'Replacer', {
+      new StringReplacer(scope, 'Replacer', {
         joiner: props.resourceLogicalId,
         splitter: PyStepFunctionsCleanup.STATE_MACHINE_RESOURCE_ID,
       });
@@ -77,7 +78,7 @@ export class PyStepFunctionsTemplateImport extends Construct {
 
   constructor(scope: Construct, id: string, props?: PyStepFunctionsTemplateImportProps) {
     super(scope, id);
-    let importer = new cloudformation_include.TemplateImporter(this, 'Importer');
+    let importer = new TemplateImporter(this, 'Importer');
     let cleanup = new PyStepFunctionsCleanup(importer, 'Cleanup', props);
 
     this.stateMachine = importer.importTemplate(templateFileName)

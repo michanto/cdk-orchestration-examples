@@ -1,4 +1,6 @@
-import { aws_lambda_nodejs, transforms, aws_stepfunctions } from '@michanto/cdk-orchestration';
+import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
+import { InsertStepFunctionState } from '@michanto/cdk-orchestration/aws-stepfunctions';
+import { Joiner } from '@michanto/cdk-orchestration/transforms';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Grant, IGrantable } from 'aws-cdk-lib/aws-iam';
 import {
@@ -37,8 +39,29 @@ export interface HitlTestStepFunctionProps {
   readonly successMode: boolean;
 }
 
-export class HitlTestStepFunctionDefinition extends Construct implements IChainable {
-  readonly chainable: IChainable;
+// TODO:  Use from library.
+export abstract class Chainable extends Construct implements IChainable {
+  readonly abstract wrapped: IChainable;
+
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+  }
+
+  get id(): string {
+    return this.wrapped.id;
+  }
+
+  get startState(): State {
+    return this.wrapped.startState;
+  };
+
+  get endStates(): INextable[] {
+    return this.wrapped.endStates;
+  };
+}
+
+export class HitlTestStepFunctionDefinition extends Chainable {
+  readonly wrapped: IChainable;
 
   constructor(scope: Construct, id: string, props: HitlTestStepFunctionProps) {
     super(scope, id);
@@ -47,7 +70,7 @@ export class HitlTestStepFunctionDefinition extends Construct implements IChaina
       result: Result.fromObject(event),
     });
 
-    const echoLambda = new aws_lambda_nodejs.InlineNodejsFunction(this, 'EchoLambda', {
+    const echoLambda = new InlineNodejsFunction(this, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
       environment: {
         LogLevel: '1',
@@ -74,30 +97,18 @@ export class HitlTestStepFunctionDefinition extends Construct implements IChaina
     }));
     echoStep.next(areRunsSuccessful);
 
-    this.chainable = Chain.start(initialStep);
+    this.wrapped = Chain.start(initialStep);
   }
-
-  get id(): string {
-    return this.chainable.id;
-  }
-
-  get startState(): State {
-    return this.chainable.startState;
-  };
-
-  get endStates(): INextable[] {
-    return this.chainable.endStates;
-  };
 }
 
 
 export class CreateConsoleLink extends Construct {
   readonly consoleLinkStep: LambdaInvoke;
-  readonly s3UrlLambda: aws_lambda_nodejs.InlineNodejsFunction;
+  readonly s3UrlLambda: InlineNodejsFunction;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    this.s3UrlLambda = new aws_lambda_nodejs.InlineNodejsFunction(this, 'S3UrlLambda', {
+    this.s3UrlLambda = new InlineNodejsFunction(this, 'S3UrlLambda', {
       entry: `${LAMBDA_PATH}/console_link.js`,
       handler: 'index.s3UriToConsoleUri',
       environment: {
@@ -136,7 +147,7 @@ export class HitlTestStack extends Stack {
     });
 
     let consoleLink = new CreateConsoleLink(this, 'CreateDeepLink');
-    new aws_stepfunctions.InsertStepFunctionState(sm1, 'NewStep', {
+    new InsertStepFunctionState(sm1, 'NewStep', {
       state: consoleLink.consoleLinkStep,
       insertAfterStep: 'AreRunsComplete?',
     });
@@ -144,7 +155,7 @@ export class HitlTestStack extends Stack {
     let sm2 = new StateMachine(this, 'MockFailHitlStateMachine', {
       definitionBody: DefinitionBody.fromChainable(failedStepFunction),
     });
-    new aws_stepfunctions.InsertStepFunctionState(sm2, 'NewStep', {
+    new InsertStepFunctionState(sm2, 'NewStep', {
       state: consoleLink.consoleLinkStep,
       insertAfterStep: 'AreRunsComplete?',
     });
@@ -152,6 +163,6 @@ export class HitlTestStack extends Stack {
     consoleLink.grantInvoke(sm1);
     consoleLink.grantInvoke(sm2);
 
-    new transforms.Joiner(this);
+    new Joiner(this);
   }
 }

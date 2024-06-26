@@ -236,7 +236,7 @@ exports[`Snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e2124bc00f4f676cc96cf8a71168ccdda227173f9bcbcad175f490ca2786104a.zip",
+          "S3Key": "4bf6e92c75279b2f6a31e4abcd5992fa8888f6bc1eb7df1795da0e2728bc42fc.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -436,7 +436,7 @@ exports[`Snapshot 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1719337676502}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1719441824511}",
               ],
             ],
           },
@@ -510,7 +510,6 @@ Greeting: result,
         "Environment": {
           "Variables": {
             "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-            "LogLevel": "18446744073709552000",
           },
         },
         "Handler": "index.reverseGreeting",
