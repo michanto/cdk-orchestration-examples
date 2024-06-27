@@ -1,6 +1,6 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { FindingConstructs01 } from '../src/main';
+import { FindingConstructs01 } from '../src/stacks/finding_constructs_01';
 
 test('Snapshot', () => {
   const app = new App();
