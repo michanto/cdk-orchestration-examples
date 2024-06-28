@@ -1,3 +1,5 @@
+import { CfnElementUtilities } from '@michanto/cdk-orchestration';
+import { Echo } from '@michanto/cdk-orchestration/transforms';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { DefinitionBody, StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
@@ -29,7 +31,7 @@ export class FindingConstructs01 extends Stack {
 
     /** /
     let lambdaTask = resources.filter(x => x.cfnResourceType == 'Custom::LambdaTask').pop()!;
-    new class extends Echo { get order() { return ImportOrders.TRANSFORMS; } }(lambdaTask, 'Echo');
+    new Echo(lambdaTask, 'Echo');
     /** /
     new RemoveSalt(lambdaTask);
 

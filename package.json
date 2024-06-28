@@ -41,7 +41,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "@michanto/cdk-orchestration": "^0.1.9",
+    "@michanto/cdk-orchestration": "^0.1.10",
     "aws-cdk-lib": "^2.1.0",
     "constructs": "^10.0.5"
   },
