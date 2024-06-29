@@ -236,7 +236,7 @@ exports[`Snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e1771e52fcea647ccedead3fbfdccbf0d045bfea362e68f66855e4947530193d.zip",
+          "S3Key": "0f39629a7d5e25829d193ad4ef168311a514e5c9a94a31bddeb54307ee14aaff.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -436,7 +436,7 @@ exports[`Snapshot 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1719604435089}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1719687723095}",
               ],
             ],
           },

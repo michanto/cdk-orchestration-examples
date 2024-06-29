@@ -1,5 +1,5 @@
-import { CfnElementUtilities } from '@michanto/cdk-orchestration';
-import { Echo } from '@michanto/cdk-orchestration/transforms';
+// import { CfnElementUtilities } from '@michanto/cdk-orchestration';
+// import { Echo } from '@michanto/cdk-orchestration/transforms';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { DefinitionBody, StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
@@ -24,6 +24,7 @@ export class FindingConstructs01 extends Stack {
 
     new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
 
+    // Uncomment the following sections and check the output for the lesson.
     /** /
     let resources = new CfnElementUtilities().cfnResources(this);
     console.log(`${resources.length} resources.`);
