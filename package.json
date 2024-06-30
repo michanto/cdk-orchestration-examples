@@ -43,7 +43,8 @@
   "dependencies": {
     "@michanto/cdk-orchestration": "^0.1.12",
     "aws-cdk-lib": "^2.1.0",
-    "constructs": "^10.0.5"
+    "constructs": "^10.0.5",
+    "esbuild": "^0.18.6"
   },
   "license": "Apache-2.0",
   "publishConfig": {

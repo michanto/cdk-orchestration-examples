@@ -6,7 +6,10 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   name: 'cdk-orchestration-examples',
   buildCommand: 'tsc', // For InlineNodejsFunction support.
   projenrcTs: true,
-  deps: ['@michanto/cdk-orchestration@^0.1.12'], /* Runtime dependencies of this module. */
+  deps: [
+    '@michanto/cdk-orchestration@^0.1.12',
+    'esbuild@^0.18.6',
+  ], /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // devDeps: [],             /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
