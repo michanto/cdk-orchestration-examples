@@ -61,19 +61,4 @@ describe('InlineNodeJsFunction tests', () => {
       },
     });
   });
-
-  test.skip('InlineNodejsFunction no esbuild', () => {
-    // GIVEN
-    const stack = new Stack();
-
-    // WHEN
-    jest.mock('esbuild', () => {
-      throw new Error();
-    });
-
-    // THEN
-    expect(() => new MyInlineFunction(stack, 'MyInlineFunction', {
-      minifyEngine: MinifyEngine.ES_BUILD,
-    })).toThrow();
-  });
 });
