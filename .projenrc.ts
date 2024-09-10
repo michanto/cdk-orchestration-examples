@@ -8,10 +8,12 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   projenrcTs: true,
   deps: [
     '@michanto/cdk-orchestration@^0.1.12',
-    'esbuild@^0.18.6',
+    'esbuild@^0.21.5',
   ], /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
+  devDeps: [
+  ],
+  /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
   tsconfigDev: {
     compilerOptions: {
@@ -26,4 +28,5 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     },
   },
 });
+
 project.synth();

@@ -1,5 +1,6 @@
 import { App } from 'aws-cdk-lib';
-import { FindingConstructs01 } from './stacks/finding_constructs_01';
+import { FindingConstructs } from './stacks/finding_constructs';
+import { TokensTokensTokens } from './stacks/tokens_tokens_tokens';
 
 // for development, use account/region from cdk cli
 const devEnv = {
@@ -9,7 +10,7 @@ const devEnv = {
 
 const app = new App();
 
-new FindingConstructs01(app, 'cdk-orch-finding-constructs-dev', { env: devEnv });
-// new FindingConstructs01(app, 'cdk-orch-finding-constructs-prod', { env: prodEnv });
+new FindingConstructs(app, 'cdk-orch-finding-constructs-dev', { env: devEnv });
+new TokensTokensTokens(app, 'TokensTokensTokens', { env: devEnv });
 
 app.synth();

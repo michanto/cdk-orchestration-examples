@@ -8,7 +8,7 @@ import { HitlTestStepFunctionDefinition } from '../constructs/hitl_test_step_fn'
 import { PyStepFunctionsImport } from '../constructs/py_step_functions_cleanup';
 
 
-export class FindingConstructs01 extends Stack {
+export class FindingConstructs extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
 
