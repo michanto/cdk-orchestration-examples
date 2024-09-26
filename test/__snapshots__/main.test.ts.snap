@@ -236,7 +236,7 @@ exports[`Snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "0f39629a7d5e25829d193ad4ef168311a514e5c9a94a31bddeb54307ee14aaff.zip",
+          "S3Key": "273beb603efd1661d18628fcbe2fdf8e87480e74afd30fc823eb7b28881c7dc0.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -436,7 +436,7 @@ exports[`Snapshot 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1725907300330}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1727296405528}",
               ],
             ],
           },
@@ -845,34 +845,98 @@ exports[`Tokens 1`] = `
     },
   },
   "Resources": {
-    "SamBucketEA70E961": {
+    "ImplicitJoinNamedBucketDA919B54": {
       "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "",
+            [
+              "implicit-join-name-",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              "-",
+              {
+                "Ref": "AWS::Region",
+              },
+            ],
+          ],
+        },
+      },
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
     },
-    "Yavanna906D5E0B": {
+    "JoinNamedBucket829C7202": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "-",
+            [
+              "join-named",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              {
+                "Ref": "AWS::Region",
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "StackNamesEnv9BC0B335": {
       "DependsOn": [
-        "YavannaServiceRoleFCBF1EDC",
+        "StackNamesEnvServiceRole79CE8D59",
       ],
       "Properties": {
         "Code": {
-          "S3Bucket": {
-            "Ref": "SamBucketEA70E961",
-          },
-          "S3Key": "1725907300330/code.zip",
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+    if (process.env.LogLevel) {
+        console.log(JSON.stringify(message));
+    }
+}
+async function handler(event, context) {
+    log({ Event: event });
+    log({ Context: context });
+    return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZWNoby5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9jb25zdHJ1Y3RzL2xhbWJkYXMvZWNoby50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUtBLDBCQUlDO0FBVEQsU0FBUyxHQUFHLENBQUMsT0FBNEI7SUFDdkMsSUFBSSxPQUFPLENBQUMsR0FBRyxDQUFDLFFBQVEsRUFBRSxDQUFDO1FBQ3pCLE9BQU8sQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLFNBQVMsQ0FBQyxPQUFPLENBQUMsQ0FBQyxDQUFDO0lBQ3ZDLENBQUM7QUFDSCxDQUFDO0FBQ00sS0FBSyxVQUFVLE9BQU8sQ0FBQyxLQUFVLEVBQUUsT0FBWTtJQUNwRCxHQUFHLENBQUMsRUFBRSxLQUFLLEVBQUUsS0FBSyxFQUFFLENBQUMsQ0FBQztJQUN0QixHQUFHLENBQUMsRUFBRSxPQUFPLEVBQUUsT0FBTyxFQUFFLENBQUMsQ0FBQztJQUMxQixPQUFPLE9BQU8sQ0FBQyxPQUFPLENBQUMsS0FBSyxhQUFMLEtBQUssY0FBTCxLQUFLLEdBQUksRUFBRSxDQUFDLENBQUM7QUFDdEMsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImZ1bmN0aW9uIGxvZyhtZXNzYWdlOiBSZWNvcmQ8c3RyaW5nLCBhbnk+KSB7XG4gIGlmIChwcm9jZXNzLmVudi5Mb2dMZXZlbCkge1xuICAgIGNvbnNvbGUubG9nKEpTT04uc3RyaW5naWZ5KG1lc3NhZ2UpKTtcbiAgfVxufVxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGhhbmRsZXIoZXZlbnQ6IGFueSwgY29udGV4dDogYW55KSB7XG4gIGxvZyh7IEV2ZW50OiBldmVudCB9KTtcbiAgbG9nKHsgQ29udGV4dDogY29udGV4dCB9KTtcbiAgcmV0dXJuIFByb21pc2UucmVzb2x2ZShldmVudCA/PyB7fSk7XG59XG4iXX0=",
         },
-        "Handler": "handler",
+        "Environment": {
+          "Variables": {
+            "REGION_TOKEN": {
+              "Ref": "AWS::Region",
+            },
+            "SPIDER": "Shelob",
+            "SPIDER_MOTHER": "Ungoliant",
+            "STACK_NAMES": "test,test-Valinor,test-Beleriand,test-AnotherStack",
+            "STATIC_NAMED_BUCKET": {
+              "Ref": "StaticNamedBucketF597C035",
+            },
+            "UNNAMED_BUCKET": {
+              "Ref": "UnnamedBucketC3A6BB1E",
+            },
+          },
+        },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "YavannaServiceRoleFCBF1EDC",
+            "StackNamesEnvServiceRole79CE8D59",
             "Arn",
           ],
         },
-        "Runtime": "nodejs16.x",
+        "Runtime": "nodejs20.x",
       },
       "Type": "AWS::Lambda::Function",
     },
-    "YavannaServiceRoleFCBF1EDC": {
+    "StackNamesEnvServiceRole79CE8D59": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -902,6 +966,19 @@ exports[`Tokens 1`] = `
         ],
       },
       "Type": "AWS::IAM::Role",
+    },
+    "StaticNamedBucketF597C035": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketName": "static-named-000000000000-us-west-2",
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "UnnamedBucketC3A6BB1E": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
     },
   },
   "Rules": {

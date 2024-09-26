@@ -1,16 +1,51 @@
-//import { AppToken, BUILD_TIME, Log, Logger, StackToken } from '@michanto/cdk-orchestration';
-import { AppToken, BUILD_TIME, Log, Logger, StackToken } from '@michanto/cdk-orchestration';
-import { App, Aws, Fn, Lazy, Stack, StackProps } from 'aws-cdk-lib';
+import { readFileSync } from 'fs';
+import { Log, Logger, StackUtilities } from '@michanto/cdk-orchestration';
+import { App, Aws, Fn, Lazy, Stack, StackProps, Token } from 'aws-cdk-lib';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 export class TokensTokensTokens extends Stack {
-  constructor(scope: Construct, id: string = 'TokensTokensTokens', props: StackProps = {}) {
+  constructor(scope: Construct, id: string = 'TokensTokensTokens', props?: StackProps) {
     super(scope, id, props);
     Logger.set(this, new Logger());
+
     let log = Log.of(this);
     log.info('// Tokens, Tokens, Tokens! //');
+
+    log.info('// How to name a bucket //');
+    let unnamedBkt = new Bucket(this, 'UnnamedBucket', {
+      bucketName: undefined,
+    });
+    log.info(`UnnamedBucket name ref: '${unnamedBkt.bucketName}' resolved: ${
+      !Token.isUnresolved(unnamedBkt.bucketName)} value: ${
+      JSON.stringify(this.resolve(unnamedBkt.bucketName))
+    }`);
+
+    let staticName = 'static-named-000000000000-us-west-2';
+    let staticNamedBucket = new Bucket(this, 'StaticNamedBucket', {
+      bucketName: staticName,
+    });
+    log.info(`StaticNamedBucket name ref: ${staticNamedBucket.bucketName} resolved: ${
+      !Token.isUnresolved(staticNamedBucket.bucketName)} value: ${
+      JSON.stringify(this.resolve(staticNamedBucket.bucketName))
+    }`);
+    log.info(`StaticNamedBucket name: ${staticName} resolved: ${
+      !Token.isUnresolved(staticName)}`);
+
+    let joinName = Fn.join('-', ['join', 'named', Aws.ACCOUNT_ID, Aws.REGION]);
+    new Bucket(this, 'JoinNamedBucket', {
+      bucketName: joinName,
+    });
+    log.info(`JoinNamedBucket name: '${joinName}' resolved: ${
+      !Token.isUnresolved(joinName)}`);
+
+    let implicitJoinName = `implicit-join-name-${Aws.ACCOUNT_ID}-${Aws.REGION}`;
+    new Bucket(this, 'ImplicitJoinNamedBucket', {
+      bucketName: implicitJoinName,
+    });
+    log.info(`ImplicitJoinNamedBucket name: '${implicitJoinName}' resolved: ${
+      !Token.isUnresolved(implicitJoinName)}`);
 
     let app = this.node.root as App;
 
@@ -39,7 +74,6 @@ export class TokensTokensTokens extends Stack {
       },
     });
 
-
     let beleriand = new Stack(app, `${this.stackName}-Beleriand`, {
       env: {
         account: this.account, region: 'eu-west-1',
@@ -64,60 +98,22 @@ export class TokensTokensTokens extends Stack {
     log.info(JSON.stringify(valinor.resolve(complexToken)));
     log.info(JSON.stringify(beleriand.resolve(complexToken)));
 
-    log.info('// @michanto/cdk-orchestration AppToken //');
-    let buildIdToken = AppToken.string(this, 'CdkOrch::BuildId', {
-      displayHint: 'BLDID',
-    });
-    log.info(JSON.stringify(buildIdToken));
-    log.info(this.toJsonString(buildIdToken));
-
-    log.info('// @michanto/cdk-orchestration StackToken //');
-    let unresolvedToken = StackToken.string(this, 'UnresolvedToken', {
-      displayHint: 'UNRESOLVED',
-    });
-    let samBucket = StackToken.string(this, 'SAM::Bucket', {
-      displayHint: 'SAM',
-    });
-    let samLambdaKey = StackToken.string(this, 'SAM::Key', {
-      displayHint: 'SAM',
-    });
-    log.info(unresolvedToken);
-    log.info(samBucket);
-    log.info(samLambdaKey);
-    try {
-      log.info(`UnresolvedToken = '${this.resolve(unresolvedToken)}'`);
-    } catch {
-      log.info(`Could not resolve ${unresolvedToken}`);
-    }
-
-    log.info('// Use the StackTokens in a function. //');
-    let codeBucket = Bucket.fromBucketName(this, 'CodeBucket', samBucket);
-    let codeKey = samLambdaKey;
-
-    new Function(this, 'Yavanna', {
-      runtime: Runtime.NODEJS_16_X,
-      code: Code.fromBucket(codeBucket, codeKey),
-      handler: 'handler',
+    new Function(this, 'StackNamesEnv', {
+      code: Code.fromInline(readFileSync(`${__dirname}/../../lib/constructs/lambdas/echo.js`).toString()),
+      handler: 'index.handler',
+      runtime: Runtime.NODEJS_20_X,
+      environment: {
+        STACK_NAMES: Lazy.string({
+          produce: () => new StackUtilities().stacks(app).map(s => s.stackName).join(','),
+        }),
+        SPIDER: spider,
+        SPIDER_MOTHER: spiderMother,
+        UNNAMED_BUCKET: unnamedBkt.bucketName,
+        STATIC_NAMED_BUCKET: staticNamedBucket.bucketName,
+        REGION_TOKEN: regionToken,
+      },
     });
 
-    log.info('// Resolve all StackTokens //');
-    let bucket = new Bucket(this, 'SamBucket');
-    let objectKey = `${buildIdToken}/code.zip`;
-
-    StackToken.resolveString(this, 'SAM::Bucket', { produce: () => bucket.bucketName });
-    StackToken.resolveString(this, 'SAM::Key', { produce: () => objectKey });
-    StackToken.resolveString(this, 'UnresolvedToken', { produce: () => 'Now Resolved' });
-    try {
-      log.info(`UnresolvedToken = '${this.resolve(unresolvedToken)}'`);
-    } catch {
-      log.info(`Could not resolve ${unresolvedToken}`);
-    }
-
-    AppToken.resolveAny(this, 'CdkOrch::BuildId', { produce: () => BUILD_TIME });
-
-    log.info(JSON.stringify(this.resolve(samBucket)));
-    log.info(this.resolve(samLambdaKey));
-
-    log.info(this.resolve(buildIdToken));
+    new Stack(app, `${this.stackName}-AnotherStack`);
   }
 }
