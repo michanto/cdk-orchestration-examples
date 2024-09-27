@@ -66,7 +66,7 @@ export class SampleTokens {
    */
   static buildIdToken(scope: Construct) {
     return AppToken.string(scope, BUILD_ID_TKN, {
-      displayHint: 'BLDID',
+      displayHint: 'BuildId',
     });
   }
 
@@ -90,7 +90,7 @@ export class OtherStack extends Stack {
 
     log.info('// @michanto/cdk-orchestration AppToken //');
     let buildIdToken = AppToken.string(this, 'build_id', {
-      displayHint: 'BLDID',
+      displayHint: 'BuildId',
     });
     log.info(JSON.stringify(buildIdToken));
     log.info(this.toJsonString(buildIdToken));

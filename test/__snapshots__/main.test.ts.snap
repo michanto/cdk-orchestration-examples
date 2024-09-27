@@ -436,7 +436,7 @@ exports[`Snapshot 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1727296405528}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1727453620323}",
               ],
             ],
           },
@@ -914,6 +914,7 @@ async function handler(event, context) {
             "REGION_TOKEN": {
               "Ref": "AWS::Region",
             },
+            "SOME_STACK_NAMES": "test,test-Valinor,test-Beleriand",
             "SPIDER": "Shelob",
             "SPIDER_MOTHER": "Ungoliant",
             "STACK_NAMES": "test,test-Valinor,test-Beleriand,test-AnotherStack",
