@@ -20,17 +20,29 @@ export class TokensTokensTokens extends Stack {
     Logger.set(this, new Logger());
 
     let log = Log.of(this);
-    log.info('//** Tokens, Tokens, Tokens! **//');
+    log.info('//** Tokens! Tokens! Tokens! **//');
 
     log.info('// Bucket names and tokens');
 
     /**
+     * Tokens are objects that:
+     * - Can be represented as a string.
+     * - Can be part of a longer string (when necessary).
+     * - Are resolved at Synthesis time (when the template.json files are
+     *   generated) by calling a produce function (see below).
+     * 
+     * A good example is the bucketName property.  Let's see how that works.
+     */
+
+    /**
+     * How do you name a bucket in the CDK?
      * One option: don't name the bucket.
-     * S3 will create a name for you.
+     * S3 will create a name for you at deployment time.
      */
     let unnamedBkt = new Bucket(this, 'UnnamedBucket', {
       bucketName: undefined,
     });
+
     /**
      * Note that the bucket.bucketName is a always a token that
      * resolved to a Fn::Ref for the S3 bucket, which always resolves
