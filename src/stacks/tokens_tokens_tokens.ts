@@ -30,7 +30,7 @@ export class TokensTokensTokens extends Stack {
      * - Can be part of a longer string (when necessary).
      * - Are resolved at Synthesis time (when the template.json files are
      *   generated) by calling a produce function (see below).
-     * 
+     *
      * A good example is the bucketName property.  Let's see how that works.
      */
 
