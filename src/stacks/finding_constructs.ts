@@ -1,4 +1,6 @@
 import { CfnElementUtilities, ConstructTreeSearch, Log, Logger, LogLevel, StackUtilities } from '@michanto/cdk-orchestration';
+import { CfnIncludeToCdk } from '@michanto/cdk-orchestration/cloudformation-include';
+import { CustomResourceUtilities } from '@michanto/cdk-orchestration/custom-resources';
 import { StepFunctionTask } from '@michanto/cdk-orchestration/orchestration';
 import { App, CfnElement, CfnResource, Resource, Stack, StackProps } from 'aws-cdk-lib';
 import { CfnBucket, Bucket } from 'aws-cdk-lib/aws-s3';
@@ -23,12 +25,13 @@ export class FindingConstructs extends Stack {
     Logger.set(app, new Logger({ logLevel: LogLevel.INFO }));
     let log = Log.of(this);
 
-    /**
-     * **********
-     * Create a bunch of resources so we have something to find.
-     * **********
-     */
+    let constructSearch = ConstructTreeSearch.for(Construct.isConstruct);
+    log.info(`Total number of constructs in app: ${constructSearch.searchDown(app).length}`);
+    log.info(`Total number of constructs in stack: ${constructSearch.searchDown(this).length}`);
 
+    /**
+     * First let's create some predicates to use when searching
+     */
     /** This predicate will tell us if an L1 CfnResource is a CfnBucket. */
     const isCfnBucket = function isCfnBucket(x: IConstruct): x is CfnBucket {
       return CfnResource.isCfnResource(x) && x.cfnResourceType == CfnBucket.CFN_RESOURCE_TYPE_NAME;
@@ -39,6 +42,12 @@ export class FindingConstructs extends Stack {
         && x.node.defaultChild != undefined
         && isCfnBucket(x.node.defaultChild);
     };
+
+    /**
+     * ************************************************************
+     * Create a bunch of resources so we have something to find.
+     * ************************************************************
+     */
 
     /**
      * An L2 bucket.
@@ -58,15 +67,31 @@ export class FindingConstructs extends Stack {
       isBucket(l2bucket));
     this.printAssertion('isCfnBucket(l1ForMyBucketL2)',
       isCfnBucket(l1ForMyBucketL2));
+    this.printAssertion('isBucket for the stack should be false',
+      isBucket(this));
+    this.printAssertion('isCfnBucket for the stack should be false',
+      isCfnBucket(this));
+
+    /** All techniques from the slide. */
+    let defaultChild = (l2bucket.node.defaultChild as CfnBucket);
+    let resourceChild = (l2bucket.node.tryFindChild('Resource') as CfnBucket);
+    let anarchy = ((l2bucket as any)._resource as CfnBucket);
+    let searchResult = ConstructTreeSearch.for(isCfnBucket).searchDown(l2bucket).pop() as CfnBucket;
+    if (defaultChild == resourceChild && resourceChild == anarchy && anarchy == searchResult) {
+      searchResult!.addMetadata('k', 'v');
+    }
 
     /**
      * This L1 bucket won't have any children.
      */
     let l1Bucket = new CfnBucket(this, 'MyCfnBucket');
     this.printAssertion('l1Bucket has no children',
-      l1Bucket.node.children.length != 0);
+      l1Bucket.node.children.length == 0);
     this.printAssertion('isCfnBucket(l1Bucket)',
       isCfnBucket(l1Bucket));
+
+    log.info(`Total number of constructs in app: ${constructSearch.searchDown(app).length}`);
+    log.info(`Total number of constructs in stack: ${constructSearch.searchDown(this).length}`);
 
     /**
      * Create another L1 bucket.  This will be turned into an IBucket.
@@ -106,7 +131,7 @@ export class FindingConstructs extends Stack {
     });
 
     /**
-     * Similar to CDK Triggers, Task classes are custom resources that call a lambda.
+     * Similar to CDK Triggers, LambdaTask classes are custom resources that call a lambda.
      */
     new GreetingLambdaTask(this, 'GreetingLambdaTask', {
       greeting: 'Hello, everyone!',
@@ -117,18 +142,22 @@ export class FindingConstructs extends Stack {
      * by the [AWS Step Functions Data Science SDK for Python](
      * https://docs.aws.amazon.com/step-functions/latest/dg/concepts-python-sdk.html)
      * tool.
+     *
+     * This construct creates a CfnInclude, which is a CfnElement.
      */
     new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
 
     /**
-     * Let's use CfnElementUtilities to find resources.
+     * Let's use CfnElementUtilities to find resources and elements.
      *
      * CfnElementUtilities uses ConstructTreeSearch internally.
      */
     let resources = new CfnElementUtilities().cfnResources(this);
     this.printConstructs(
-      `Found ${resources.length} CfnResources in FindingConstructs stack.`, resources);
+      'CfnResources in FindingConstructs stack.', resources);
 
+    log.info(`Total number of constructs in app: ${constructSearch.searchDown(app).length}`);
+    log.info(`Total number of constructs in stack: ${constructSearch.searchDown(this).length}`);
 
     /** Now let's find the L1 CfnBucket we created above. */
     let findL1Bucket = new CfnElementUtilities()
@@ -139,12 +168,14 @@ export class FindingConstructs extends Stack {
     let lambdaTasks = resources.filter(x => x.cfnResourceType == 'Custom::LambdaTask');
     this.printConstructs('Found Custom::LambdaTasks', lambdaTasks);
 
+    /** Predicate to find stacks with a given region */
     const isStackForRegion = function isStackForRegion(region: string) {
       return (x: IConstruct ) => {
         return Stack.isStack(x) && x.region == region;
       };
     };
 
+    /** Predicate to find stacks with a given account */
     const isStackForAccount = function isStackForAccount(account: string) {
       return (x: IConstruct ) => {
         return Stack.isStack(x) && x.account == account;
@@ -164,40 +195,36 @@ export class FindingConstructs extends Stack {
     this.printConstructs('All stacks in region eu-west-1.', dubStacks);
     this.printConstructs('All stacks for account 000000000002.', twoStacks.searchDown(app));
 
-    let defaultChild = (l2bucket.node.defaultChild as CfnBucket);
-    let resourceChild = (l2bucket.node.tryFindChild('Resource') as CfnBucket);
-    let anarchy = ((l2bucket as any)._resource as CfnBucket);
-    let searchResult = ConstructTreeSearch.for(isCfnBucket).searchDown(l2bucket).pop() as CfnBucket;
-    if (defaultChild == resourceChild && resourceChild == anarchy && anarchy == searchResult) {
-      searchResult!.addMetadata('k', 'v');
-    }
-
     let isFrankenstein = function(elt: IConstruct) {
-      return Resource.isResource(elt) && CfnResource.isCfnResource(elt.node.scope);
-    };
-
-    let isCustomResource = function isCustomResource(elt: Construct) {
-      return CfnResource.isCfnResource(elt) &&
-        (elt.cfnResourceType == 'AWS::CloudFormation::CustomResource' ||
-        elt.cfnResourceType.startsWith('Custom::'));
+      return Resource.isResource(elt)
+        && CfnResource.isCfnResource(elt.node.scope)
+        && elt.node.defaultChild == elt.node.scope;
     };
 
     let elementSearch = ConstructTreeSearch.for(CfnElement.isCfnElement);
     let stackSearch = ConstructTreeSearch.for(Stack.isStack);
-    let customResourceSearch = ConstructTreeSearch.for(isCustomResource);
+    let customResourceSearch = ConstructTreeSearch.for(CustomResourceUtilities.isCustomResource);
     let l2Search = ConstructTreeSearch.for(Resource.isResource);
     let frankensteinL2Search = ConstructTreeSearch.for(isFrankenstein);
-    console.log(frankensteinL2Search.searchDown(this).length);
     this.printConstructs('Frankenstein buckets', frankensteinL2Search.searchDown(this));
 
     // Use searchSelfAndDescendents to search down the tree.
     log.info('Find all CfnElements in this stack');
-    this.printConstructs('All elemetns in FindingConstructs stack',
-      elementSearch.searchDown(this, Stack.isStack));
-    this.printConstructs('All CfnElements in the app.', elementSearch.searchDown(app));
-    this.printConstructs('All stacks in the app', stackSearch.searchDown(app));
+    let elements = elementSearch.searchDown(this, Stack.isStack);
+    log.info(`Number of CfnResources in the stack: ${resources.length}`);
+    log.info(`Number of CfnElements in the stack: ${elements.length}`);
+    /**
+     * Note that the PyStepFunctionsImport creates a CfnInclude, so there is 1 CfnElement
+     * in this stack that is NOT a CfnResource.
+     */
+    this.printConstructs('All CfnElements that are not resources',
+      elements.filter(x => !(resources as IConstruct[]).includes(x)));
+    this.printConstructs('All CfnInclude constructs in FindingConstructs stack.',
+      ConstructTreeSearch.for(CfnIncludeToCdk.isCfnInclude).searchDown(this));
+    log.info(`Number of CfnElements in the app: ${elementSearch.searchDown(app).length}`);
+    log.info(`Number of stacks in the app: ${stackSearch.searchDown(app).length}`);
     this.printConstructs('All stacks in the stack FindingConstructucts', stackSearch.searchDown(this));
-    this.printConstructs('All custom resource ', customResourceSearch.searchDown(app));
+    this.printConstructs('All custom resources in the app', customResourceSearch.searchDown(app));
     this.printConstructs('All frankenstein L2 constructs.', frankensteinL2Search.searchDown(app));
     let awsCustomResource = new AwsCustomResource(this, 'MyRes', {
       onCreate: {
@@ -214,7 +241,7 @@ export class FindingConstructs extends Stack {
         resources: [l2bucket.bucketArn, `${l2bucket.bucketArn}/*`],
       }),
     });
-    console.log('Path of AwsCustomResource ' + awsCustomResource.node.path);
+    log.info('Path of AwsCustomResource ' + awsCustomResource.node.path);
 
     this.printConstructs('All custom resources in the app.', customResourceSearch.searchDown(app));
 
@@ -237,17 +264,20 @@ export class FindingConstructs extends Stack {
     let stack = stackSearch.searchUp(l2bucket);
     if (stack) {
       log.info(`Found stack for Bucket ${
-        l2bucket.node.path}: ` + stackSearch.searchUp(l2bucket)?.node.path);
+        l2bucket.node.path}: ` + stack.node.path);
     }
 
     // SearchSelf to test a single construct.  Useful for RTTI.
     log.info('Is bucket a stack? ' + String(stackSearch.searchSelf(l2bucket) != undefined));
     log.info('Is stack a stack? ' + String(stackSearch.searchSelf(this) != undefined));
+
+    log.info(`Total number of constructs in app: ${constructSearch.searchDown(app).length}`);
+    log.info(`Total number of constructs in stack: ${constructSearch.searchDown(this).length}`);
   }
 
   printAssertion(purpose: string, value: boolean) {
     const log = Log.of(this);
-    log.info(`(${purpose}): ${value}`);
+    log.info(`${purpose}: ${value}`);
   }
 
   printConstructs(purpose: string, found: IConstruct[]) {
