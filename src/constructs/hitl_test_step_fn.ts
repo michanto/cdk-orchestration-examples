@@ -1,5 +1,5 @@
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
-import { InsertStepFunctionState } from '@michanto/cdk-orchestration/aws-stepfunctions';
+import { Chainable, InsertStepFunctionState } from '@michanto/cdk-orchestration/aws-stepfunctions';
 import { Joiner } from '@michanto/cdk-orchestration/transforms';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Grant, IGrantable } from 'aws-cdk-lib/aws-iam';
@@ -10,11 +10,9 @@ import {
   DefinitionBody,
   Fail,
   IChainable,
-  INextable,
   JsonPath,
   Pass,
   Result,
-  State,
   StateMachine,
   Succeed,
 } from 'aws-cdk-lib/aws-stepfunctions';
@@ -39,27 +37,9 @@ export interface HitlTestStepFunctionProps {
   readonly successMode: boolean;
 }
 
-// TODO:  Use from library.
-export abstract class Chainable extends Construct implements IChainable {
-  readonly abstract wrapped: IChainable;
-
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
-  }
-
-  get id(): string {
-    return this.wrapped.id;
-  }
-
-  get startState(): State {
-    return this.wrapped.startState;
-  };
-
-  get endStates(): INextable[] {
-    return this.wrapped.endStates;
-  };
-}
-
+/**
+ * Chainable is the abstract base class for creating state machine definitions.
+ */
 export class HitlTestStepFunctionDefinition extends Chainable {
   readonly wrapped: IChainable;
 
