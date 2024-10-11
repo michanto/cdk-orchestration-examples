@@ -34,7 +34,9 @@ export class FindingConstructs extends Stack {
      */
     /** This predicate will tell us if an L1 CfnResource is a CfnBucket. */
     const isCfnBucket = function isCfnBucket(x: IConstruct): x is CfnBucket {
-      return CfnResource.isCfnResource(x) && x.cfnResourceType == CfnBucket.CFN_RESOURCE_TYPE_NAME;
+      return CfnElement.isCfnElement(x)
+        && CfnResource.isCfnResource(x)
+        && x.cfnResourceType == CfnBucket.CFN_RESOURCE_TYPE_NAME;
     };
     /** This predicate will tell us if an L2 Resource is a Bucket. */
     const isBucket = function isBucket(x: IConstruct): x is Bucket {
@@ -110,7 +112,8 @@ export class FindingConstructs extends Stack {
     this.printAssertion('frankensteinsBucket parent is otherCfnBucket',
       frankensteinsBucket.node.scope == otherCfnBucket);
 
-    /** Now let's create some complex L3 constructs. */
+    log.info("** Now let's create some complex L3 constructs.");
+
     /**
      * HitlTestStepFunctionDefinition defines a state machine definition as a construct
      * by using the Chainable base class from cdk-orchestration.
@@ -146,6 +149,22 @@ export class FindingConstructs extends Stack {
      * This construct creates a CfnInclude, which is a CfnElement.
      */
     new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
+
+    let awsCustomResource = new AwsCustomResource(this, 'MyS3FileResource', {
+      onCreate: {
+        service: 'S3',
+        action: 'putObject',
+        parameters: {
+          Body: JSON.stringify({ dummy: 'data' }),
+          Bucket: l2bucket.bucketName,
+          Key: 'dummy.json',
+        },
+        physicalResourceId: PhysicalResourceId.of(`s3:://${l2bucket.bucketName}/dummy.json`),
+      },
+      policy: AwsCustomResourcePolicy.fromSdkCalls({
+        resources: [l2bucket.bucketArn, `${l2bucket.bucketArn}/*`],
+      }),
+    });
 
     /**
      * Let's use CfnElementUtilities to find resources and elements.
@@ -216,6 +235,7 @@ export class FindingConstructs extends Stack {
     let customResourceSearch = ConstructTreeSearch.for(CustomResourceUtilities.isCustomResource);
     let l2Search = ConstructTreeSearch.for(Resource.isResource);
     let frankensteinL2Search = ConstructTreeSearch.for(isFrankenstein);
+    let chainableSearch = ConstructTreeSearch.for(isChainable);
     let statesSearch = ConstructTreeSearch.for(isState);
     this.printConstructs('Frankenstein buckets', frankensteinL2Search.searchDown(this));
 
@@ -224,7 +244,7 @@ export class FindingConstructs extends Stack {
     let elements = elementSearch.searchDown(this, Stack.isStack);
     log.info(`Number of CfnResources in the stack: ${resources.length}`);
     log.info(`Number of CfnElements in the stack: ${elements.length}`);
-    this.printConstructs('StateMachine States in the stack', statesSearch.searchDown(this));
+
     /**
      * Note that the PyStepFunctionsImport creates a CfnInclude, so there is 1 CfnElement
      * in this stack that is NOT a CfnResource.
@@ -233,26 +253,18 @@ export class FindingConstructs extends Stack {
       elements.filter(x => !(resources as IConstruct[]).includes(x)));
     this.printConstructs('All CfnInclude constructs in FindingConstructs stack.',
       ConstructTreeSearch.for(CfnIncludeToCdk.isCfnInclude).searchDown(this));
+
+    /**
+     * These constructs are neither L1, L2 nor L3.
+     */
+    this.printConstructs('StateMachine States in the stack', statesSearch.searchDown(this));
+    this.printConstructs('Chainable in the stack', chainableSearch.searchDown(this));
+
     log.info(`Number of CfnElements in the app: ${elementSearch.searchDown(app).length}`);
     log.info(`Number of stacks in the app: ${stackSearch.searchDown(app).length}`);
     this.printConstructs('All stacks in the stack FindingConstructucts', stackSearch.searchDown(this));
     this.printConstructs('All custom resources in the app', customResourceSearch.searchDown(app));
     this.printConstructs('All frankenstein L2 constructs.', frankensteinL2Search.searchDown(app));
-    let awsCustomResource = new AwsCustomResource(this, 'MyRes', {
-      onCreate: {
-        service: 'S3',
-        action: 'putObject',
-        parameters: {
-          Body: JSON.stringify({ dummy: 'data' }),
-          Bucket: l2bucket.bucketName,
-          Key: 'dummy.json',
-        },
-        physicalResourceId: PhysicalResourceId.of('dummy'),
-      },
-      policy: AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [l2bucket.bucketArn, `${l2bucket.bucketArn}/*`],
-      }),
-    });
     log.info('Path of AwsCustomResource ' + awsCustomResource.node.path);
 
     this.printConstructs('All custom resources in the app.', customResourceSearch.searchDown(app));
@@ -296,8 +308,10 @@ export class FindingConstructs extends Stack {
     const log = Log.of(this);
     log.info(`Results for ${purpose} (${found.length}):`);
     found.forEach(c => {
-      if (CfnResource.isCfnResource(c)) {
+      if (CfnElement.isCfnElement(c) && CfnResource.isCfnResource(c)) {
         log.info(`  ${c.node.path} (${c.cfnResourceType})`);
+      } else if (CfnElement.isCfnElement(c) ) {
+        log.info(`  ${c.node.path} (CfnElement)`);
       } else {
         log.info(`  ${c.node.path}`);
       }
