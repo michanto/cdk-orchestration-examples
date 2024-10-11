@@ -150,7 +150,7 @@ export class FindingConstructs extends Stack {
      */
     new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
 
-    let awsCustomResource = new AwsCustomResource(this, 'MyS3FileResource', {
+    new AwsCustomResource(this, 'MyS3FileResource', {
       onCreate: {
         service: 'S3',
         action: 'putObject',
@@ -237,7 +237,7 @@ export class FindingConstructs extends Stack {
     let frankensteinL2Search = ConstructTreeSearch.for(isFrankenstein);
     let chainableSearch = ConstructTreeSearch.for(isChainable);
     let statesSearch = ConstructTreeSearch.for(isState);
-    this.printConstructs('Frankenstein buckets', frankensteinL2Search.searchDown(this));
+    this.printConstructs('Frankenstein constructs', frankensteinL2Search.searchDown(this));
 
     // Use searchSelfAndDescendents to search down the tree.
     log.info('Find all CfnElements in this stack');
@@ -260,19 +260,14 @@ export class FindingConstructs extends Stack {
     this.printConstructs('StateMachine States in the stack', statesSearch.searchDown(this));
     this.printConstructs('Chainable in the stack', chainableSearch.searchDown(this));
 
-    log.info(`Number of CfnElements in the app: ${elementSearch.searchDown(app).length}`);
     log.info(`Number of stacks in the app: ${stackSearch.searchDown(app).length}`);
     this.printConstructs('All stacks in the stack FindingConstructucts', stackSearch.searchDown(this));
-    this.printConstructs('All custom resources in the app', customResourceSearch.searchDown(app));
-    this.printConstructs('All frankenstein L2 constructs.', frankensteinL2Search.searchDown(app));
-    log.info('Path of AwsCustomResource ' + awsCustomResource.node.path);
-
     this.printConstructs('All custom resources in the app.', customResourceSearch.searchDown(app));
 
     let customResource = customResourceSearch.searchDown(app).pop();
     // Look up the tree to find an L2.
     if (customResource) {
-      console.log(`Found L2 for custom resource ${
+      log.info(`Found L2 for custom resource ${
         customResource.node.path}: ` + l2Search.searchUp(customResource)?.node.path);
     }
 
