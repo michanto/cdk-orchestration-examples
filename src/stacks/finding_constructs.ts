@@ -4,7 +4,7 @@ import { CustomResourceUtilities } from '@michanto/cdk-orchestration/custom-reso
 import { StepFunctionTask } from '@michanto/cdk-orchestration/orchestration';
 import { App, CfnElement, CfnResource, Resource, Stack, StackProps } from 'aws-cdk-lib';
 import { CfnBucket, Bucket } from 'aws-cdk-lib/aws-s3';
-import { DefinitionBody, StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
+import { DefinitionBody, StateMachine, State } from 'aws-cdk-lib/aws-stepfunctions';
 import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy } from 'aws-cdk-lib/custom-resources';
 import { Construct, IConstruct } from 'constructs';
 import { GreetingLambdaTask } from '../constructs/greeting_lambda_task';
@@ -182,6 +182,16 @@ export class FindingConstructs extends Stack {
       };
     };
 
+    const isChainable = function isChainabled(x: IConstruct) {
+      let asAny = x as any;
+      return typeof asAny.id == 'string' && typeof asAny.startState == 'object'
+        && Array.isArray(asAny.endStates);
+    };
+    const isState = function isState(x: IConstruct): x is State {
+      let asAny = x as any;
+      return isChainable(x) && typeof asAny.stateId == 'string';
+    };
+
     /** Create a bunch of stacks and search for them. */
     new Stack(app, 'OneUsWest2', { env: { account: '000000000001', region: 'us-west-2' } });
     new Stack(app, 'OneUsEast1', { env: { account: '000000000001', region: 'us-east-1' } });
@@ -206,6 +216,7 @@ export class FindingConstructs extends Stack {
     let customResourceSearch = ConstructTreeSearch.for(CustomResourceUtilities.isCustomResource);
     let l2Search = ConstructTreeSearch.for(Resource.isResource);
     let frankensteinL2Search = ConstructTreeSearch.for(isFrankenstein);
+    let statesSearch = ConstructTreeSearch.for(isState);
     this.printConstructs('Frankenstein buckets', frankensteinL2Search.searchDown(this));
 
     // Use searchSelfAndDescendents to search down the tree.
@@ -213,6 +224,7 @@ export class FindingConstructs extends Stack {
     let elements = elementSearch.searchDown(this, Stack.isStack);
     log.info(`Number of CfnResources in the stack: ${resources.length}`);
     log.info(`Number of CfnElements in the stack: ${elements.length}`);
+    this.printConstructs('StateMachine States in the stack', statesSearch.searchDown(this));
     /**
      * Note that the PyStepFunctionsImport creates a CfnInclude, so there is 1 CfnElement
      * in this stack that is NOT a CfnResource.
