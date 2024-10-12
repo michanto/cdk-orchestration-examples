@@ -298,7 +298,7 @@ exports[`FindingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "273beb603efd1661d18628fcbe2fdf8e87480e74afd30fc823eb7b28881c7dc0.zip",
+          "S3Key": "76048811ea2359bb1c276d52487fb5bed04c9c414167d6faba91205c1383c6a1.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -498,7 +498,7 @@ exports[`FindingConstructs 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1728682583783}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1728772496103}",
               ],
             ],
           },
@@ -787,7 +787,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
     "MyBucketF68F3FF0": {
       "DeletionPolicy": "Retain",
       "Metadata": {
-        "k": "v",
+        "cirdan": "shipwright",
       },
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
@@ -915,7 +915,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "HitlStateMachine1F6B4EA3",
                 },
-                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1728682583783}",
+                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1728772496103}",
               ],
             ],
           },
@@ -945,7 +945,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1728682583783}",
+                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1728772496103}",
               ],
             ],
           },
@@ -975,7 +975,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","Suffix":"2","OutputPaths":[],"salt":1728682583783}",
+                "","Suffix":"2","OutputPaths":[],"salt":1728772496103}",
               ],
             ],
           },

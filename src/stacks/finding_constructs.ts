@@ -80,7 +80,7 @@ export class FindingConstructs extends Stack {
     let anarchy = ((l2bucket as any)._resource as CfnBucket);
     let searchResult = ConstructTreeSearch.for(isCfnBucket).searchDown(l2bucket).pop() as CfnBucket;
     if (defaultChild == resourceChild && resourceChild == anarchy && anarchy == searchResult) {
-      searchResult!.addMetadata('k', 'v');
+      searchResult.addMetadata('cirdan', 'shipwright');
     }
 
     /**
