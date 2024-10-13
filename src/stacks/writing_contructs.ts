@@ -1,7 +1,7 @@
-import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo, ICfnResourcePredicate } from '@michanto/cdk-orchestration';
+import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo } from '@michanto/cdk-orchestration';
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { CustomResourceUtilities } from '@michanto/cdk-orchestration/custom-resources';
-import { CfnResource, Resource, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnResource, Stack, StackProps } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Trigger } from 'aws-cdk-lib/triggers';
 import { Construct, IConstruct } from 'constructs';
@@ -17,10 +17,6 @@ export interface AddMetadataProperties {
   readonly key: string;
   /** Metadata value. */
   readonly value: any;
-  /** Resource type to add metadata to. Optional. */
-  readonly resourceType?: string;
-  /** Predicate to use when searching for CfnResource. Optional. */
-  readonly predicate?: ICfnResourcePredicate;
 }
 
 /**
@@ -57,39 +53,15 @@ export class AddMetadata extends Construct {
   get target(): CfnResource | Stack {
     let scope = this.node.scope!;
 
-    // If either of these are specified, use findCfnResource.
-    if (this.props?.resourceType || this.props?.predicate) {
-      // This function will throw if more than one matching CfnResource is found under the scope,
-      // or if no matching resource is found.
-      return new CfnElementUtilities().findCfnResource(scope, this.props.resourceType, this.props.predicate);
-    }
-
-    // If this construct is added to a stack, the user wants stack metadata.
-    // Otherwise, the user wants CfnResource metadata.
+    // If this construct is added to a stack, the user wants to add stack metadata.
+    // Otherwise, the user wants to add CfnResource metadata.
     if (Stack.isStack(scope)) {
       return scope;
     }
-    // If the scope is an L1, return it.
-    if (CfnElementUtilities.isCfnResource(scope)) {
-      return scope;
-    }
-    // If the scope is an L2, return the L1
-    if (Resource.isResource(scope) && scope.node.defaultChild) {
-      return scope.node.defaultChild as CfnResource;
-    }
 
-    // If there is a single CfnResource under the scope, we'll add metadata to it.
-    // This supports the L3 construct case.
+    // Otherwise the user wants to add metadata to a CfnResource under scope.
     return new CfnElementUtilities().findCfnResource(scope);
   }
-}
-
-/** Optional properties for AddSalt construct. */
-export interface AddSaltProperties {
-  /** Custom Resource type to add salt to. Optional. */
-  readonly resourceType?: string;
-  /** Predicate to use when searching for the custom resource. Optional. */
-  readonly predicate?: ICfnResourcePredicate;
 }
 
 /**
@@ -106,15 +78,14 @@ export interface AddSaltProperties {
  * We can go ahead and implement that, but for ANY custom resource.
  */
 export class AddSalt extends Construct {
-  constructor(scope: Construct, id: string = 'AddSalt', readonly props?: AddSaltProperties) {
+  constructor(scope: Construct, id: string = 'AddSalt') {
     super(scope, id);
     this.target.addPropertyOverride('salt', BUILD_TIME);
   }
 
   get target() {
     let scope = this.node.scope!;
-    return new CustomResourceUtilities().findCustomResource(scope,
-      this.props?.resourceType, this.props?.predicate);
+    return new CustomResourceUtilities().findCustomResource(scope);
   }
 }
 

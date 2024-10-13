@@ -68,7 +68,7 @@
     },
     {
       "name": "@michanto/cdk-orchestration",
-      "version": "^0.1.17",
+      "version": "^0.1.18",
       "type": "runtime"
     },
     {
