@@ -1,5 +1,5 @@
 import { ConstructRunTimeTypeInfo, ConstructTreeSearch, IStopCondition, Log, Logger, LogLevel } from '@michanto/cdk-orchestration';
-import { App, CfnElement, Stack, StackProps } from 'aws-cdk-lib';
+import { App, Aws, CfnElement, Stack, StackProps } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
 import { NAMESPACE } from '../private/internal';
@@ -15,14 +15,14 @@ export class TypedConstruct extends Construct {
    * Return the TypedConstruct hosting the given construct.
    */
   static of(x: IConstruct): TypedConstruct | undefined {
-    let host = TypedConstruct.TYPED_CONSTRUCT_RTTI.searchUp(x);
+    let host = TypedConstruct.TYPED_CONSTRUCT_RTTI.searchUp(x)?.scope;
     return host as TypedConstruct | undefined;
   }
 
   /**
    * Return all typed constructs under the given scope.
    */
-  static typedConstructs(scope: IConstruct, stopCondition?: IStopCondition) {
+  static typedConstructs(scope: IConstruct, stopCondition?: IStopCondition): TypedConstruct[] {
     return ConstructTreeSearch.for(TypedConstruct.isTypedConstruct)
       .searchDown(scope, stopCondition);
   }
@@ -40,8 +40,8 @@ export class TypedConstruct extends Construct {
 /**
  * Demonstrate built in and custom RTTI in the CDK.
  */
-export class ConstructRtti extends Stack {
-  constructor(scope: IConstruct, id: string, props?: StackProps) {
+export class RuntimeTypeInfo extends Stack {
+  constructor(scope: IConstruct, id: string = 'RuntimeTypeInfo', props?: StackProps) {
     super(scope, id, props);
     let app = this.node.root as App;
     Logger.set(app, new Logger({ logLevel: LogLevel.INFO }));
@@ -54,7 +54,9 @@ export class ConstructRtti extends Stack {
 
     new TypedConstruct(this, 'UnderStack');
     new TypedConstruct(this.node.root, 'UnderApp');
-    let bucket = new Bucket(this, 'MyBucket');
+    let bucket = new Bucket(this, 'MyBucket', {
+      bucketName: `my_bucket-${Aws.ACCOUNT_ID}-${Aws.REGION}`,
+    });
     new TypedConstruct(bucket, 'UnderBucket');
     new TypedConstruct(bucket.node.defaultChild!, 'UnderCfnBucket');
     let parent = new TypedConstruct(this, 'AParent');

@@ -93,7 +93,7 @@ export class AddSalt extends Construct {
  *
  */
 export class WritingConstructs extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps) {
+  constructor(scope: Construct, id: string = 'WritingConstructs', props?: StackProps) {
     super(scope, id, props);
 
     new AddMetadata(this, 'StackMetadata', {

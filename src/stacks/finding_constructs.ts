@@ -201,7 +201,7 @@ export class FindingConstructs extends Stack {
       };
     };
 
-    const isChainable = function isChainabled(x: IConstruct) {
+    const isChainable = function isChainable(x: IConstruct) {
       let asAny = x as any;
       return typeof asAny.id == 'string' && typeof asAny.startState == 'object'
         && Array.isArray(asAny.endStates);

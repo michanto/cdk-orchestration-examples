@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { FindingConstructs } from './stacks/finding_constructs';
+import { RuntimeTypeInfo } from './stacks/runtime_type_info';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new FindingConstructs(app, 'FindingConstructs', { env: devEnv });
+new RuntimeTypeInfo(app, 'RuntimeTypeInfo', { env: devEnv });
 
 app.synth();
