@@ -1,0 +1,257 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WritingConstructs 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "FunctionOne8A86801F": {
+      "DependsOn": [
+        "FunctionOneServiceRoleB0F6870D",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+if (process.env.LogLevel) {
+console.log(JSON.stringify(message));
+}
+}
+async function handler(event, context) {
+log({ Event: event });
+log({ Context: context });
+return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "ELF": "Arondir",
+            "HOBBIT": "Drogo",
+            "MOUNTAIN": "Taniquetil",
+            "SPIDER": "Ungoliant",
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionOneServiceRoleB0F6870D",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "FunctionOneServiceRoleB0F6870D": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "FunctionThreeBD583616": {
+      "DependsOn": [
+        "FunctionThreeServiceRoleB755B2EA",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+if (process.env.LogLevel) {
+console.log(JSON.stringify(message));
+}
+}
+async function handler(event, context) {
+log({ Event: event });
+log({ Context: context });
+return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "MOUNTAIN": "Taniquetil",
+            "SPIDER": "Ungoliant",
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionThreeServiceRoleB755B2EA",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "FunctionThreeServiceRoleB755B2EA": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "FunctionTwoDAB66576": {
+      "DependsOn": [
+        "FunctionTwoServiceRoleF26DAB39",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+if (process.env.LogLevel) {
+console.log(JSON.stringify(message));
+}
+}
+async function handler(event, context) {
+log({ Event: event });
+log({ Context: context });
+return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "HOBBIT": "Poppy",
+            "MOUNTAIN": "Taniquetil",
+            "SPIDER": "Ungoliant",
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionTwoServiceRoleF26DAB39",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "FunctionTwoServiceRoleF26DAB39": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MyBucketF68F3FF0": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
