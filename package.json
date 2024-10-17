@@ -41,7 +41,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@michanto/cdk-orchestration": "^0.1.19",
+    "@michanto/cdk-orchestration": "^0.1.20",
     "aws-cdk-lib": "^2.1.0",
     "constructs": "^10.0.5",
     "esbuild": "^0.21.5"
@@ -53,6 +53,7 @@
   "version": "0.0.0",
   "jest": {
     "coverageProvider": "v8",
+    "maxWorkers": 4,
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.ts?(x)",
       "<rootDir>/@(test|src)/**/*(*.)@(spec|test).ts?(x)"
