@@ -112,7 +112,7 @@ exports[`WritingConstructs 1`] = `
     },
   },
   "Metadata": {
-    "StackMetadata": "Arondir",
+    "Elf": "Arondir",
   },
   "Parameters": {
     "BootstrapVersion": {
@@ -284,15 +284,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "MyBucketF68F3FF0": {
-      "DeletionPolicy": "Retain",
-      "Metadata": {
-        "BucketMetadata": "Taniquetil",
-      },
-      "Type": "AWS::S3::Bucket",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "TiggerEcho": {
+    "EchoTrigger": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "ExecuteOnHandlerChange": true,
@@ -307,10 +299,18 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729192735003,
+        "salt": 1729267836294,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",
+    },
+    "MyBucketF68F3FF0": {
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "Mountain": "Taniquetil",
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
     },
   },
   "Rules": {

@@ -12,7 +12,8 @@ export class TypedConstruct extends Construct {
   }
 
   /**
-   * Return the TypedConstruct hosting the given construct.
+   * Return the TypedConstruct hosting (antecedent in the tree to)
+   * the given construct.
    */
   static of(x: IConstruct): TypedConstruct | undefined {
     let host = TypedConstruct.TYPED_CONSTRUCT_RTTI.searchUp(x)?.scope;
@@ -20,7 +21,9 @@ export class TypedConstruct extends Construct {
   }
 
   /**
-   * Return all typed constructs under the given scope.
+   * Return all typed constructs under the given scope, with an optional stop condition.
+   *
+   * Stop conditions are mostly used to limit searches to within the same stack.
    */
   static typedConstructs(scope: IConstruct, stopCondition?: IStopCondition): TypedConstruct[] {
     return ConstructTreeSearch.for(TypedConstruct.isTypedConstruct)
@@ -64,6 +67,7 @@ export class RuntimeTypeInfo extends Stack {
     let subStack = new Stack(this, 'SubStack');
     new TypedConstruct(subStack, 'UnderSubStack');
 
+    // Custom RTTI.
     log.info(`isTypedConstruct true example: ${
       TypedConstruct.isTypedConstruct(parent)}`);
     log.info(`isTypedConstruct false example: ${
@@ -79,6 +83,6 @@ export class RuntimeTypeInfo extends Stack {
     log.info(`TypedConstruct above hostedBucket:\n${
       TypedConstruct.of(hostedBucket)!.node.path}`);
     // Get the stack of all TypedConstructs under the Stack
-    TypedConstruct.typedConstructs(this).forEach(t => Stack.of(t));
+    TypedConstruct.typedConstructs(this, Stack.isStack).forEach(t => Stack.of(t));
   }
 }

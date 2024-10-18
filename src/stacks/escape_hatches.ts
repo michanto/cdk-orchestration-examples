@@ -10,7 +10,7 @@ import { NAMESPACE } from '../private/internal';
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 
 /**
- * A well designd construct has a Properties interface with readonly members.
+ * A well designed construct has a Properties interface with readonly members.
  */
 export interface AddMetadataProperties {
   /** Metadata key. */
@@ -24,7 +24,7 @@ export interface AddMetadataProperties {
  *
  * A well designed construct has documentation.
  *
- * A well designed construct works with Stacks (if applicable),
+ * An well designed escape hatch construct works with Stacks (if applicable),
  * L1, L2 or L3 constructs without the user having to navigate
  * the construct tree.
  */
@@ -47,8 +47,8 @@ export class AddMetadata extends Construct {
 
   /**
    * By puttng the target in a getter, subclasses can easily override the target.
-   *
-   * That really expands the usefulness of our Construct
+   * This expands the usefulness of our Construct.
+   * For example, the user could target a specfic resource type in a sub tree.
    */
   get target(): CfnResource | Stack {
     let scope = this.node.scope!;
@@ -68,7 +68,7 @@ export class AddMetadata extends Construct {
  * Adds Salt property to any custom resource.
  * NOTE:  This exists in cdk-orchestration as RunResourceAlways construct.
  *
- * In the CDK Tiggers [documentation](
+ * In the CDK Triggers [documentation](
  * https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.triggers-readme.html) it says:
  * >> In the future we will consider adding support for additional re-execution modes:
  *
@@ -90,19 +90,24 @@ export class AddSalt extends Construct {
 }
 
 /**
+ * Show how to use [Escape Hatches](https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html)
+ * in the CDK.
  *
+ * The 'cfn layer' document recommends using L1 methods and raw overrides as escape hatches.
+ * Here, we'll see that we can encapsulate these as constructs and use searches to make working
+ * with escape hatches more natural.
  */
-export class WritingConstructs extends Stack {
+export class EscapeHatches extends Stack {
   constructor(scope: Construct, id: string = 'WritingConstructs', props?: StackProps) {
     super(scope, id, props);
 
     new AddMetadata(this, 'StackMetadata', {
-      key: 'StackMetadata', value: 'Arondir',
+      key: 'Elf', value: 'Arondir',
     });
 
     let bucket = new Bucket(this, 'MyBucket');
     new AddMetadata(bucket, 'BucketMetadata', {
-      key: 'BucketMetadata', value: 'Taniquetil',
+      key: 'Mountain', value: 'Taniquetil',
     });
 
     const echoLambda = new InlineNodejsFunction(this, 'EchoLambda', {
@@ -112,7 +117,7 @@ export class WritingConstructs extends Stack {
       },
     });
 
-    let trigger = new Trigger(this, 'TiggerEcho', {
+    let trigger = new Trigger(this, 'EchoTrigger', {
       handler: echoLambda,
     });
     new AddSalt(trigger);
