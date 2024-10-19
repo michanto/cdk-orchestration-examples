@@ -29,16 +29,18 @@ export class TypedConstruct extends Construct {
       .searchDown(scope, stopCondition);
   }
 
+  /** RunTime Type Info for the TypedConstruct class. */
   private static readonly TYPED_CONSTRUCT_RTTI = new ConstructRunTimeTypeInfo({
     servicePropertyName: `${NAMESPACE}.test.TypedConstruct`,
   });
 
   /**
-   * Return the TypedConstruct host for a construct (if any) and cache the result on
+   * Return the TypedConstruct 'host' for a construct (if any) and cache the result on
    * the construct.
    *
-   * Similar to how Stack.of works.  The cache is a symbol `${NAMESPACE}.TransformHostCache`,
-   * but the factory just does a searchUp the tree for a TypedConstruct
+   * Similar to how Stack.of works.  The cache is a symbol-keyed property for the global symbol
+   * `${NAMESPACE}.test.TypedConstruct.myTypedConstruct`.
+   * The factory just does a searchUp the tree for a TypedConstruct, and may return undefined.
    */
   private static readonly TYPED_CONSTRUCT_OF = new ConstructService({
     servicePropertyName: `${TypedConstruct.TYPED_CONSTRUCT_RTTI.props.servicePropertyName}.myTypedConstruct`,
