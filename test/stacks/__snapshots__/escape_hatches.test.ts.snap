@@ -37,7 +37,16 @@ exports[`WritingConstructs 1`] = `
       "ap-southeast-4": {
         "value": "nodejs20.x",
       },
+      "ap-southeast-5": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-7": {
+        "value": "nodejs20.x",
+      },
       "ca-central-1": {
+        "value": "nodejs20.x",
+      },
+      "ca-west-1": {
         "value": "nodejs20.x",
       },
       "cn-north-1": {
@@ -51,6 +60,9 @@ exports[`WritingConstructs 1`] = `
       },
       "eu-central-2": {
         "value": "nodejs20.x",
+      },
+      "eu-isoe-west-1": {
+        "value": "nodejs18.x",
       },
       "eu-north-1": {
         "value": "nodejs20.x",
@@ -77,6 +89,9 @@ exports[`WritingConstructs 1`] = `
         "value": "nodejs20.x",
       },
       "me-south-1": {
+        "value": "nodejs20.x",
+      },
+      "mx-central-1": {
         "value": "nodejs20.x",
       },
       "sa-east-1": {
@@ -131,7 +146,7 @@ exports[`WritingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "9b642d28372ac0688d94d58f71770ceba997be43db88ea4b1cd0081a3ac5231e.zip",
+          "S3Key": "fe27a81f1e8702187a8717117fe7516f45948616ac25cefe80cc7e202365594b.zip",
         },
         "Handler": "__entrypoint__.handler",
         "MemorySize": 128,
@@ -299,7 +314,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729267836294,
+        "salt": 1729368435485,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",

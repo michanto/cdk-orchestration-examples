@@ -21,7 +21,7 @@
     },
     {
       "name": "aws-cdk",
-      "version": "^2.1.0",
+      "version": "^2.162.1",
       "type": "build"
     },
     {
@@ -68,17 +68,17 @@
     },
     {
       "name": "@michanto/cdk-orchestration",
-      "version": "^0.1.20",
+      "version": "^0.1.21",
       "type": "runtime"
     },
     {
       "name": "aws-cdk-lib",
-      "version": "^2.1.0",
+      "version": "^2.162.1",
       "type": "runtime"
     },
     {
       "name": "constructs",
-      "version": "^10.0.5",
+      "version": "^10.4.2",
       "type": "runtime"
     },
     {

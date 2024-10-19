@@ -1,13 +1,14 @@
 import { awscdk } from 'projen';
 import { TypeScriptModuleResolution } from 'projen/lib/javascript';
 const project = new awscdk.AwsCdkTypeScriptApp({
-  cdkVersion: '2.1.0',
+  cdkVersion: '2.162.1',
+  constructsVersion: '10.4.2',
   defaultReleaseBranch: 'main',
   name: 'cdk-orchestration-examples',
   buildCommand: 'tsc', // For InlineNodejsFunction support.
   projenrcTs: true,
   deps: [
-    '@michanto/cdk-orchestration@^0.1.20',
+    '@michanto/cdk-orchestration@^0.1.21',
     'esbuild@^0.21.5',
   ], /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
@@ -29,7 +30,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   },
   jestOptions: {
     jestConfig: {
-      maxWorkers: 4,
+      maxWorkers: 2,
     },
   },
 });

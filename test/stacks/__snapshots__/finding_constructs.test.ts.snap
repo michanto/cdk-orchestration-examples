@@ -38,7 +38,16 @@ exports[`FindingConstructs 1`] = `
       "ap-southeast-4": {
         "value": "nodejs20.x",
       },
+      "ap-southeast-5": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-7": {
+        "value": "nodejs20.x",
+      },
       "ca-central-1": {
+        "value": "nodejs20.x",
+      },
+      "ca-west-1": {
         "value": "nodejs20.x",
       },
       "cn-north-1": {
@@ -52,6 +61,9 @@ exports[`FindingConstructs 1`] = `
       },
       "eu-central-2": {
         "value": "nodejs20.x",
+      },
+      "eu-isoe-west-1": {
+        "value": "nodejs18.x",
       },
       "eu-north-1": {
         "value": "nodejs20.x",
@@ -78,6 +90,9 @@ exports[`FindingConstructs 1`] = `
         "value": "nodejs20.x",
       },
       "me-south-1": {
+        "value": "nodejs20.x",
+      },
+      "mx-central-1": {
         "value": "nodejs20.x",
       },
       "sa-east-1": {
@@ -109,113 +124,6 @@ exports[`FindingConstructs 1`] = `
       },
       "us-west-2": {
         "value": "nodejs20.x",
-      },
-    },
-    "ServiceprincipalMap": {
-      "af-south-1": {
-        "states": "states.af-south-1.amazonaws.com",
-      },
-      "ap-east-1": {
-        "states": "states.ap-east-1.amazonaws.com",
-      },
-      "ap-northeast-1": {
-        "states": "states.ap-northeast-1.amazonaws.com",
-      },
-      "ap-northeast-2": {
-        "states": "states.ap-northeast-2.amazonaws.com",
-      },
-      "ap-northeast-3": {
-        "states": "states.ap-northeast-3.amazonaws.com",
-      },
-      "ap-south-1": {
-        "states": "states.ap-south-1.amazonaws.com",
-      },
-      "ap-south-2": {
-        "states": "states.ap-south-2.amazonaws.com",
-      },
-      "ap-southeast-1": {
-        "states": "states.ap-southeast-1.amazonaws.com",
-      },
-      "ap-southeast-2": {
-        "states": "states.ap-southeast-2.amazonaws.com",
-      },
-      "ap-southeast-3": {
-        "states": "states.ap-southeast-3.amazonaws.com",
-      },
-      "ap-southeast-4": {
-        "states": "states.ap-southeast-4.amazonaws.com",
-      },
-      "ca-central-1": {
-        "states": "states.ca-central-1.amazonaws.com",
-      },
-      "cn-north-1": {
-        "states": "states.cn-north-1.amazonaws.com",
-      },
-      "cn-northwest-1": {
-        "states": "states.cn-northwest-1.amazonaws.com",
-      },
-      "eu-central-1": {
-        "states": "states.eu-central-1.amazonaws.com",
-      },
-      "eu-central-2": {
-        "states": "states.eu-central-2.amazonaws.com",
-      },
-      "eu-north-1": {
-        "states": "states.eu-north-1.amazonaws.com",
-      },
-      "eu-south-1": {
-        "states": "states.eu-south-1.amazonaws.com",
-      },
-      "eu-south-2": {
-        "states": "states.eu-south-2.amazonaws.com",
-      },
-      "eu-west-1": {
-        "states": "states.eu-west-1.amazonaws.com",
-      },
-      "eu-west-2": {
-        "states": "states.eu-west-2.amazonaws.com",
-      },
-      "eu-west-3": {
-        "states": "states.eu-west-3.amazonaws.com",
-      },
-      "il-central-1": {
-        "states": "states.il-central-1.amazonaws.com",
-      },
-      "me-central-1": {
-        "states": "states.me-central-1.amazonaws.com",
-      },
-      "me-south-1": {
-        "states": "states.me-south-1.amazonaws.com",
-      },
-      "sa-east-1": {
-        "states": "states.sa-east-1.amazonaws.com",
-      },
-      "us-east-1": {
-        "states": "states.us-east-1.amazonaws.com",
-      },
-      "us-east-2": {
-        "states": "states.us-east-2.amazonaws.com",
-      },
-      "us-gov-east-1": {
-        "states": "states.us-gov-east-1.amazonaws.com",
-      },
-      "us-gov-west-1": {
-        "states": "states.us-gov-west-1.amazonaws.com",
-      },
-      "us-iso-east-1": {
-        "states": "states.amazonaws.com",
-      },
-      "us-iso-west-1": {
-        "states": "states.amazonaws.com",
-      },
-      "us-isob-east-1": {
-        "states": "states.amazonaws.com",
-      },
-      "us-west-1": {
-        "states": "states.us-west-1.amazonaws.com",
-      },
-      "us-west-2": {
-        "states": "states.us-west-2.amazonaws.com",
       },
     },
   },
@@ -236,7 +144,7 @@ exports[`FindingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "97f30e67419a1676a2215492723e5add1aa491caf0cbe2dd878fc4fab0468cd4.zip",
+          "S3Key": "ce2f3595a340d6c519a65888ef97e3b9b64f053f83608e32cc28162e22d7d99a.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -298,7 +206,7 @@ exports[`FindingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e99b6a4d57cfa9af47189e0bca07e8be9993ee70164de1f895920bd45caddc2f.zip",
+          "S3Key": "f3ca17c24c60384e72e534abd2085e902df9c0439cdf34d1734f6d7dac54411f.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -322,7 +230,7 @@ exports[`FindingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3542be390685e0c8353d92ccb5796d343cd93ca946b6b0de798004206a199adc.zip",
+          "S3Key": "4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip",
         },
         "Description": "AWS CDK resource provider framework - onEvent (FindingConstructs/CDKORCHCUSTOMRESOURCE::Resources/CDKORCHCUSTOMRESOURCEProvider)",
         "Environment": {
@@ -498,7 +406,7 @@ exports[`FindingConstructs 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1729267821383}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1729368434921}",
               ],
             ],
           },
@@ -657,15 +565,7 @@ Greeting: result,
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": {
-                  "Fn::FindInMap": [
-                    "ServiceprincipalMap",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    "states",
-                  ],
-                },
+                "Service": "states.amazonaws.com",
               },
             },
           ],
@@ -881,15 +781,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": {
-                  "Fn::FindInMap": [
-                    "ServiceprincipalMap",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    "states",
-                  ],
-                },
+                "Service": "states.amazonaws.com",
               },
             },
           ],
@@ -915,7 +807,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "HitlStateMachine1F6B4EA3",
                 },
-                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1729267821383}",
+                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1729368434921}",
               ],
             ],
           },
@@ -945,7 +837,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1729267821383}",
+                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1729368434921}",
               ],
             ],
           },
@@ -975,7 +867,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","Suffix":"2","OutputPaths":[],"salt":1729267821383}",
+                "","Suffix":"2","OutputPaths":[],"salt":1729368434921}",
               ],
             ],
           },
@@ -1436,7 +1328,7 @@ exports.stepFunctionComplete = stepFunctionComplete;",
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3542be390685e0c8353d92ccb5796d343cd93ca946b6b0de798004206a199adc.zip",
+          "S3Key": "4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip",
         },
         "Description": "AWS CDK resource provider framework - isComplete (FindingConstructs/StepFunctionTaskStepResources/StepFunctionTaskStepProvider)",
         "Environment": {
@@ -1584,7 +1476,7 @@ exports.stepFunctionComplete = stepFunctionComplete;",
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3542be390685e0c8353d92ccb5796d343cd93ca946b6b0de798004206a199adc.zip",
+          "S3Key": "4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip",
         },
         "Description": "AWS CDK resource provider framework - onEvent (FindingConstructs/StepFunctionTaskStepResources/StepFunctionTaskStepProvider)",
         "Environment": {
@@ -1742,7 +1634,7 @@ exports.stepFunctionComplete = stepFunctionComplete;",
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3542be390685e0c8353d92ccb5796d343cd93ca946b6b0de798004206a199adc.zip",
+          "S3Key": "4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip",
         },
         "Description": "AWS CDK resource provider framework - onTimeout (FindingConstructs/StepFunctionTaskStepResources/StepFunctionTaskStepProvider)",
         "Environment": {
@@ -1961,15 +1853,7 @@ exports.stepFunctionComplete = stepFunctionComplete;",
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": {
-                  "Fn::FindInMap": [
-                    "ServiceprincipalMap",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    "states",
-                  ],
-                },
+                "Service": "states.amazonaws.com",
               },
             },
           ],

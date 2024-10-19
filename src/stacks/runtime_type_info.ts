@@ -1,4 +1,4 @@
-import { ConstructRunTimeTypeInfo, ConstructTreeSearch, IStopCondition, Log, Logger, LogLevel } from '@michanto/cdk-orchestration';
+import { ConstructRunTimeTypeInfo, ConstructService, ConstructTreeSearch, IStopCondition, Log, Logger, LogLevel } from '@michanto/cdk-orchestration';
 import { App, Aws, CfnElement, Stack, StackProps } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct, IConstruct } from 'constructs';
@@ -16,8 +16,7 @@ export class TypedConstruct extends Construct {
    * the given construct.
    */
   static of(x: IConstruct): TypedConstruct | undefined {
-    let host = TypedConstruct.TYPED_CONSTRUCT_RTTI.searchUp(x)?.scope;
-    return host as TypedConstruct | undefined;
+    return TypedConstruct.TYPED_CONSTRUCT_OF.searchSelfOrCreate(x)?.scope;
   }
 
   /**
@@ -32,6 +31,20 @@ export class TypedConstruct extends Construct {
 
   private static readonly TYPED_CONSTRUCT_RTTI = new ConstructRunTimeTypeInfo({
     servicePropertyName: `${NAMESPACE}.test.TypedConstruct`,
+  });
+
+  /**
+   * Return the TypedConstruct host for a construct (if any) and cache the result on
+   * the construct.
+   *
+   * Similar to how Stack.of works.  The cache is a symbol `${NAMESPACE}.TransformHostCache`,
+   * but the factory just does a searchUp the tree for a TypedConstruct
+   */
+  private static readonly TYPED_CONSTRUCT_OF = new ConstructService({
+    servicePropertyName: `${TypedConstruct.TYPED_CONSTRUCT_RTTI.props.servicePropertyName}.myTypedConstruct`,
+    factory: (c: Construct) => {
+      return TypedConstruct.TYPED_CONSTRUCT_RTTI.searchUp(c, Stack.isStack)?.scope;
+    },
   });
 
   constructor(scope: Construct, id: string) {
@@ -49,6 +62,8 @@ export class RuntimeTypeInfo extends Stack {
     let app = this.node.root as App;
     Logger.set(app, new Logger({ logLevel: LogLevel.INFO }));
     let log = Log.of(this);
+
+    log.info('RunTimeTypeInfo -- BEGIN');
 
     // Built in RTTI
     log.info(`This construct is a stack: ${Stack.isStack(this)}`);
@@ -72,17 +87,19 @@ export class RuntimeTypeInfo extends Stack {
       TypedConstruct.isTypedConstruct(parent)}`);
     log.info(`isTypedConstruct false example: ${
       TypedConstruct.isTypedConstruct(bucket)}`);
-    log.info(`TypedConstructs in this app:\n${
+    log.info(`TypedConstructs in this app:\n  ${
       TypedConstruct.typedConstructs(app).map(c => c.node.path).join('\n  ')}`);
-    log.info(`TypedConstructs in this stack:\n${
+    log.info(`TypedConstructs in this stack:\n  ${
       TypedConstruct.typedConstructs(this, Stack.isStack).map(c => c.node.path).join('\n  ')}`);
-    log.info(`TypedConstructs under this stack:\n${
+    log.info(`TypedConstructs under this stack:\n  ${
       TypedConstruct.typedConstructs(this).map(c => c.node.path).join('\n  ')}`);
-    log.info(`TypedConstructs in the sub stack:\n${
+    log.info(`TypedConstructs in the sub stack:\n  ${
       TypedConstruct.typedConstructs(subStack).map(c => c.node.path).join('\n  ')}`);
-    log.info(`TypedConstruct above hostedBucket:\n${
+    log.info(`TypedConstruct above hostedBucket:\n  ${
       TypedConstruct.of(hostedBucket)!.node.path}`);
     // Get the stack of all TypedConstructs under the Stack
     TypedConstruct.typedConstructs(this, Stack.isStack).forEach(t => Stack.of(t));
+
+    log.info('RunTimeTypeInfo -- END');
   }
 }
