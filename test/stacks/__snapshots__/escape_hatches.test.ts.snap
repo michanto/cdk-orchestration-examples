@@ -314,7 +314,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729368435485,
+        "salt": 1729451750617,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",

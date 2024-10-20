@@ -16,7 +16,7 @@ export class TypedConstruct extends Construct {
    * the given construct.
    */
   static of(x: IConstruct): TypedConstruct | undefined {
-    return TypedConstruct.TYPED_CONSTRUCT_OF.searchSelfOrCreate(x)?.scope;
+    return TypedConstruct.TYPED_CONSTRUCT_OF.searchSelfOrCreate(x)?.service;
   }
 
   /**
