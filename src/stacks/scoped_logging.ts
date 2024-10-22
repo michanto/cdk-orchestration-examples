@@ -37,6 +37,8 @@ export class ScopedLogging extends Stack {
     // This will add LogLevel varible to all Functions.
     Aspects.of(this).add(new LoggingAspect());
 
+    // NOTE:  Below console.log lines are meant as comments in the output.
+    // Calls to Log.of indicate lesson code.
     /**
      * Mark the beginning and end of the constructor to
      * make it easier to find in the build output.

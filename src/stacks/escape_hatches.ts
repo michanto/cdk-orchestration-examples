@@ -1,13 +1,26 @@
-import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo } from '@michanto/cdk-orchestration';
+import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo, Log } from '@michanto/cdk-orchestration';
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
-import { CustomResourceUtilities } from '@michanto/cdk-orchestration/custom-resources';
-import { CfnResource, Stack, StackProps } from 'aws-cdk-lib';
+import { CustomResourceUtilities, RunResourceAlways } from '@michanto/cdk-orchestration/custom-resources';
+import { CfnElement, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Trigger } from 'aws-cdk-lib/triggers';
 import { Construct, IConstruct } from 'constructs';
 import { NAMESPACE } from '../private/internal';
 
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
+
+export class StackDescription extends CfnElement {
+  constructor(scope: Construct, id: string, readonly description: string) {
+    super(scope, id);
+  }
+
+  _toCloudFormation(): object {
+    return {
+      Description: this.description,
+    };
+  }
+}
 
 /**
  * A well designed construct has a Properties interface with readonly members.
@@ -78,9 +91,10 @@ export class AddMetadata extends Construct {
  * We can go ahead and implement that, but for ANY custom resource.
  */
 export class AddSalt extends Construct {
-  constructor(scope: Construct, id: string = 'AddSalt') {
+  constructor(scope: Construct, id: string = 'AddSalt', readonly saltValue: number = BUILD_TIME ) {
     super(scope, id);
-    this.target.addPropertyOverride('salt', BUILD_TIME);
+    this.target.addPropertyOverride('salt', saltValue);
+    Log.of(this).debug(() => `Added salt value ${saltValue}.`);
   }
 
   get target() {
@@ -99,7 +113,11 @@ export class AddSalt extends Construct {
  */
 export class EscapeHatches extends Stack {
   constructor(scope: Construct, id: string = 'WritingConstructs', props?: StackProps) {
-    super(scope, id, props);
+    super(scope, id, { ...props, description: 'EscapeHatches description.' });
+    let log = Log.of(this);
+
+    new StackDescription(this, 'Description', 'This string will be in the stack description');
+    new StackDescription(this, 'Description2', 'And so will this one.');
 
     new AddMetadata(this, 'StackMetadata', {
       key: 'Elf', value: 'Arondir',
@@ -117,9 +135,37 @@ export class EscapeHatches extends Stack {
       },
     });
 
+    /*
+    new class extends AddMetadata {
+      get target(): CfnResource | Stack {
+        return new CfnElementUtilities().findCfnResource(scope, CfnRole.CFN_RESOURCE_TYPE_NAME);
+      }
+    }(echoLambda, 'RoleMetadata', {
+      key: 'Maia', value: 'Bombadillo',
+    }); */
+
     let trigger = new Trigger(this, 'EchoTrigger', {
       handler: echoLambda,
     });
+    log.debug(() => 'Echo lambda will trigger on every deployment.');
     new AddSalt(trigger);
+
+    let writer = new AwsCustomResource(this, 'MyS3FileResource', {
+      onCreate: {
+        service: 'S3',
+        action: 'putObject',
+        parameters: {
+          Body: JSON.stringify({ dummy: 'data' }),
+          Bucket: bucket.bucketName,
+          Key: 'dummy.json',
+        },
+        physicalResourceId: PhysicalResourceId.of(`s3:://${bucket.bucketName}/dummy.json`),
+      },
+      installLatestAwsSdk: false,
+      policy: AwsCustomResourcePolicy.fromSdkCalls({
+        resources: [bucket.bucketArn, `${bucket.bucketArn}/*`],
+      }),
+    });
+    new RunResourceAlways(writer);
   }
 }

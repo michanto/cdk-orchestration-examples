@@ -2,6 +2,9 @@
 
 exports[`WritingConstructs 1`] = `
 {
+  "Description": "EscapeHatches description.
+This string will be in the stack description
+And so will this one.",
   "Mappings": {
     "LatestNodeRuntimeMap": {
       "af-south-1": {
@@ -137,6 +140,68 @@ exports[`WritingConstructs 1`] = `
     },
   },
   "Resources": {
+    "AWS679f53fac002430cb0da5b7982bd22872D164C4C": {
+      "DependsOn": [
+        "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "ce2f3595a340d6c519a65888ef97e3b9b64f053f83608e32cc28162e22d7d99a.zip",
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+            "Arn",
+          ],
+        },
+        "Runtime": {
+          "Fn::FindInMap": [
+            "LatestNodeRuntimeMap",
+            {
+              "Ref": "AWS::Region",
+            },
+            "value",
+          ],
+        },
+        "Timeout": 120,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
     "AWSCDKTriggerCustomResourceProviderCustomResourceProviderHandler97BECD91": {
       "DependsOn": [
         "AWSCDKTriggerCustomResourceProviderCustomResourceProviderRoleE18FAF0A",
@@ -314,7 +379,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729451750617,
+        "salt": 1729610436734,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",
@@ -326,6 +391,82 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
+    },
+    "MyS3FileResource1CAF1D27": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "MyS3FileResourceCustomResourcePolicy761A62A0",
+      ],
+      "Properties": {
+        "Create": {
+          "Fn::Join": [
+            "",
+            [
+              "{"service":"S3","action":"putObject","parameters":{"Body":"{\\"dummy\\":\\"data\\"}","Bucket":"",
+              {
+                "Ref": "MyBucketF68F3FF0",
+              },
+              "","Key":"dummy.json"},"physicalResourceId":{"id":"s3:://",
+              {
+                "Ref": "MyBucketF68F3FF0",
+              },
+              "/dummy.json"}}",
+            ],
+          ],
+        },
+        "InstallLatestAwsSdk": false,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+        "salt": 1729610436734,
+      },
+      "Type": "Custom::AWS",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MyS3FileResourceCustomResourcePolicy761A62A0": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:PutObject",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyBucketF68F3FF0",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "MyBucketF68F3FF0",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MyS3FileResourceCustomResourcePolicy761A62A0",
+        "Roles": [
+          {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
   },
   "Rules": {

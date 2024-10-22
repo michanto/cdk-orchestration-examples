@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { RuntimeTypeInfo } from './stacks/runtime_type_info';
+import { EscapeHatches } from './stacks/escape_hatches';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new RuntimeTypeInfo(app, 'RuntimeTypeInfo', { env: devEnv });
+new EscapeHatches(app, 'EscapeHatches', { env: devEnv });
 
 app.synth();
