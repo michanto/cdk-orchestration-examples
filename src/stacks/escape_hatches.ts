@@ -2,6 +2,7 @@ import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo, Log } from '
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { CustomResourceUtilities, RunResourceAlways } from '@michanto/cdk-orchestration/custom-resources';
 import { CfnElement, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnRole } from 'aws-cdk-lib/aws-iam';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Trigger } from 'aws-cdk-lib/triggers';
@@ -135,14 +136,17 @@ export class EscapeHatches extends Stack {
       },
     });
 
-    /*
-    new class extends AddMetadata {
+    new AddMetadata(echoLambda, 'FunctionMetadata', {
+      key: 'Dwarf', value: 'Balin',
+    });
+
+    new class AddRoleMetadata extends AddMetadata {
       get target(): CfnResource | Stack {
-        return new CfnElementUtilities().findCfnResource(scope, CfnRole.CFN_RESOURCE_TYPE_NAME);
+        return new CfnElementUtilities().findCfnResource(this.node.scope!, CfnRole.CFN_RESOURCE_TYPE_NAME);
       }
     }(echoLambda, 'RoleMetadata', {
       key: 'Maia', value: 'Bombadillo',
-    }); */
+    });
 
     let trigger = new Trigger(this, 'EchoTrigger', {
       handler: echoLambda,
@@ -151,7 +155,7 @@ export class EscapeHatches extends Stack {
     new AddSalt(trigger);
 
     let writer = new AwsCustomResource(this, 'MyS3FileResource', {
-      onCreate: {
+      onUpdate: {
         service: 'S3',
         action: 'putObject',
         parameters: {

@@ -292,6 +292,9 @@ And so will this one.",
       "DependsOn": [
         "EchoLambdaServiceRole6F110512",
       ],
+      "Metadata": {
+        "Dwarf": "Balin",
+      },
       "Properties": {
         "Code": {
           "ZipFile": ""use strict";
@@ -334,6 +337,9 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       "Type": "AWS::Lambda::Version",
     },
     "EchoLambdaServiceRole6F110512": {
+      "Metadata": {
+        "Maia": "Bombadillo",
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -379,7 +385,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729610436734,
+        "salt": 1729698142087,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",
@@ -421,7 +427,23 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
             "Arn",
           ],
         },
-        "salt": 1729610436734,
+        "Update": {
+          "Fn::Join": [
+            "",
+            [
+              "{"service":"S3","action":"putObject","parameters":{"Body":"{\\"dummy\\":\\"data\\"}","Bucket":"",
+              {
+                "Ref": "MyBucketF68F3FF0",
+              },
+              "","Key":"dummy.json"},"physicalResourceId":{"id":"s3:://",
+              {
+                "Ref": "MyBucketF68F3FF0",
+              },
+              "/dummy.json"}}",
+            ],
+          ],
+        },
+        "salt": 1729698142087,
       },
       "Type": "Custom::AWS",
       "UpdateReplacePolicy": "Delete",
