@@ -1,4 +1,4 @@
-import { BUILD_TIME, CfnElementUtilities, ConstructRunTimeTypeInfo, Log } from '@michanto/cdk-orchestration';
+import { BUILD_TIME, CfnElementUtilities, Log } from '@michanto/cdk-orchestration';
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { CustomResourceUtilities, RunResourceAlways } from '@michanto/cdk-orchestration/custom-resources';
 import { CfnElement, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
@@ -6,16 +6,70 @@ import { CfnRole } from 'aws-cdk-lib/aws-iam';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Trigger } from 'aws-cdk-lib/triggers';
-import { Construct, IConstruct } from 'constructs';
-import { NAMESPACE } from '../private/internal';
+import { Construct } from 'constructs';
 
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 
+/**
+ * # AddSalt escape hatch construct.
+ *
+ * Adds a varying 'salt' property to any custom resource.  This ensures that the
+ * custom resource runs one per every deployed build.  The salt value is the BUILD_TIME constant,
+ * calculated at library load time as `Date.now()`.
+ *
+ * NOTE:  This class exists in cdk-orchestration library as RunResourceAlways.
+ * Here because it's a good example of an escape hatch construct.
+ *
+ * ## Motivation:
+ * In the CDK Triggers [documentation](
+ * https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.triggers-readme.html) it says:
+ * >> In the future we will consider adding support for additional re-execution modes:
+ *
+ * >> `executeOnEveryDeployment`: boolean - re-executes every time the stack is
+ * deployed (add random "salt" during synthesis).
+ *
+ * We can go ahead and implement that, but for ANY custom resource.
+ */
+export class AddSalt extends Construct {
+  constructor(scope: Construct, id: string = 'AddSalt', readonly saltValue: number = BUILD_TIME ) {
+    super(scope, id);
+    this.target.addPropertyOverride('salt', saltValue);
+    Log.of(this).debug(() => `Added salt value ${saltValue}.`);
+  }
+
+  /**
+   * By puttng the target in a getter, subclasses can easily override the target.
+   * This expands the usefulness of our Construct.
+   * For example, the user could target a specfic resource type in a sub tree.
+   */
+  get target() {
+    let scope = this.node.scope!;
+    return new CustomResourceUtilities().findCustomResource(scope);
+  }
+}
+
+/**
+ * This construct demonstrates that any CfnElement (L1 construct) can add to the stack description.
+ *
+ * This CfnElement returns a CloudFormation template fragment.
+ *
+ * Synthesis works by merging the CloudFormation template fragments from
+ * all the CfnElements in the Stack subtree.  So this CfnElement
+ * returns a simple template fragment.  See how it affects the template.json
+ * file.
+ *
+ *
+ * CDK template merging code link: See `Stack._toCloudFormation` at
+ * https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/core/lib/stack.ts.
+ **/
 export class StackDescription extends CfnElement {
   constructor(scope: Construct, id: string, readonly description: string) {
     super(scope, id);
   }
 
+  /**
+   * Abstract method that returns a CloudFormation template fragment.
+   */
   _toCloudFormation(): object {
     return {
       Description: this.description,
@@ -24,7 +78,8 @@ export class StackDescription extends CfnElement {
 }
 
 /**
- * A well designed construct has a Properties interface with readonly members.
+ * Properties interface for AddMetadata class.
+ * All properties interface members should be readonly.
  */
 export interface AddMetadataProperties {
   /** Metadata key. */
@@ -43,19 +98,9 @@ export interface AddMetadataProperties {
  * the construct tree.
  */
 export class AddMetadata extends Construct {
-  /** RTTI is optional depending on your use case. */
-  static isAddMetadata(x: IConstruct): x is AddMetadata {
-    return AddMetadata.ADD_METADATA_CONSTRUCT_RTTI.hasRtti(x);
-  }
-
-  private static readonly ADD_METADATA_CONSTRUCT_RTTI = new ConstructRunTimeTypeInfo({
-    servicePropertyName: `${NAMESPACE}.AddMetadata`,
-  });
-
   constructor(scope: Construct, id: string, readonly props: AddMetadataProperties) {
     super(scope, id);
 
-    AddMetadata.ADD_METADATA_CONSTRUCT_RTTI.addRtti(this);
     this.target.addMetadata(props.key, props.value);
   }
 
@@ -79,32 +124,6 @@ export class AddMetadata extends Construct {
 }
 
 /**
- * Adds Salt property to any custom resource.
- * NOTE:  This exists in cdk-orchestration as RunResourceAlways construct.
- *
- * In the CDK Triggers [documentation](
- * https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.triggers-readme.html) it says:
- * >> In the future we will consider adding support for additional re-execution modes:
- *
- * >> `executeOnEveryDeployment`: boolean - re-executes every time the stack is
- * deployed (add random "salt" during synthesis).
- *
- * We can go ahead and implement that, but for ANY custom resource.
- */
-export class AddSalt extends Construct {
-  constructor(scope: Construct, id: string = 'AddSalt', readonly saltValue: number = BUILD_TIME ) {
-    super(scope, id);
-    this.target.addPropertyOverride('salt', saltValue);
-    Log.of(this).debug(() => `Added salt value ${saltValue}.`);
-  }
-
-  get target() {
-    let scope = this.node.scope!;
-    return new CustomResourceUtilities().findCustomResource(scope);
-  }
-}
-
-/**
  * Show how to use [Escape Hatches](https://docs.aws.amazon.com/cdk/v2/guide/cfn_layer.html)
  * in the CDK.
  *
@@ -113,7 +132,7 @@ export class AddSalt extends Construct {
  * with escape hatches more natural.
  */
 export class EscapeHatches extends Stack {
-  constructor(scope: Construct, id: string = 'WritingConstructs', props?: StackProps) {
+  constructor(scope: Construct, id: string = 'EscapeHatches', props?: StackProps) {
     super(scope, id, { ...props, description: 'EscapeHatches description.' });
     let log = Log.of(this);
 
