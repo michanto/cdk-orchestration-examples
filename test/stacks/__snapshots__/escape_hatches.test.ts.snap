@@ -3,7 +3,7 @@
 exports[`WritingConstructs 1`] = `
 {
   "Description": "EscapeHatches description.
-This string will be in the stack description
+This string will be in the stack description.
 And so will this one.",
   "Mappings": {
     "LatestNodeRuntimeMap": {
@@ -385,7 +385,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1729733866024,
+        "salt": 1729782691447,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",
@@ -443,7 +443,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
             ],
           ],
         },
-        "salt": 1729733866024,
+        "salt": 1729782691447,
       },
       "Type": "Custom::AWS",
       "UpdateReplacePolicy": "Delete",

@@ -1,4 +1,4 @@
-import { BUILD_TIME, CfnElementUtilities, Log } from '@michanto/cdk-orchestration';
+import { BUILD_TIME, CfnElementUtilities } from '@michanto/cdk-orchestration';
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { CustomResourceUtilities, RunResourceAlways } from '@michanto/cdk-orchestration/custom-resources';
 import { CfnElement, CfnResource, Stack, StackProps } from 'aws-cdk-lib';
@@ -13,33 +13,27 @@ const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 /**
  * # AddSalt escape hatch construct.
  *
- * Adds a varying 'salt' property to any custom resource.  This ensures that the
- * custom resource runs one per every deployed build.  The salt value is the BUILD_TIME constant,
- * calculated at library load time as `Date.now()`.
- *
- * NOTE:  This class exists in cdk-orchestration library as RunResourceAlways.
- * Here because it's a good example of an escape hatch construct.
- *
- * ## Motivation:
  * In the CDK Triggers [documentation](
  * https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.triggers-readme.html) it says:
  * >> In the future we will consider adding support for additional re-execution modes:
- *
- * >> `executeOnEveryDeployment`: boolean - re-executes every time the stack is
+ * >> - `executeOnEveryDeployment`: boolean - re-executes every time the stack is
  * deployed (add random "salt" during synthesis).
  *
- * We can go ahead and implement that, but for ANY custom resource.
+ * AddSalt implements that, but for ANY custom resource.  The random salt is a build timestamp,
+ * calculated as Date.now() at library-load time.
+ *
+ * NOTE:  This class is in cdk-orchestration library as RunResourceAlways.
  */
 export class AddSalt extends Construct {
-  constructor(scope: Construct, id: string = 'AddSalt', readonly saltValue: number = BUILD_TIME ) {
+  constructor(scope: Construct, id: string = 'AddSalt') {
     super(scope, id);
-    this.target.addPropertyOverride('salt', saltValue);
-    Log.of(this).debug(() => `Added salt value ${saltValue}.`);
+    this.target.addPropertyOverride('salt', BUILD_TIME);
   }
 
   /**
    * By puttng the target in a getter, subclasses can easily override the target.
    * This expands the usefulness of our Construct.
+   *
    * For example, the user could target a specfic resource type in a sub tree.
    */
   get target() {
@@ -51,16 +45,7 @@ export class AddSalt extends Construct {
 /**
  * This construct demonstrates that any CfnElement (L1 construct) can add to the stack description.
  *
- * This CfnElement returns a CloudFormation template fragment.
- *
- * Synthesis works by merging the CloudFormation template fragments from
- * all the CfnElements in the Stack subtree.  So this CfnElement
- * returns a simple template fragment.  See how it affects the template.json
- * file.
- *
- *
- * CDK template merging code link: See `Stack._toCloudFormation` at
- * https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/core/lib/stack.ts.
+ * CfnElements return a CloudFormation template fragment that gets merged into the stack template.json file.
  **/
 export class StackDescription extends CfnElement {
   constructor(scope: Construct, id: string, readonly description: string) {
@@ -134,9 +119,8 @@ export class AddMetadata extends Construct {
 export class EscapeHatches extends Stack {
   constructor(scope: Construct, id: string = 'EscapeHatches', props?: StackProps) {
     super(scope, id, { ...props, description: 'EscapeHatches description.' });
-    let log = Log.of(this);
 
-    new StackDescription(this, 'Description', 'This string will be in the stack description');
+    new StackDescription(this, 'Description', 'This string will be in the stack description.');
     new StackDescription(this, 'Description2', 'And so will this one.');
 
     new AddMetadata(this, 'StackMetadata', {
@@ -170,7 +154,6 @@ export class EscapeHatches extends Stack {
     let trigger = new Trigger(this, 'EchoTrigger', {
       handler: echoLambda,
     });
-    log.debug(() => 'Echo lambda will trigger on every deployment.');
     new AddSalt(trigger);
 
     let writer = new AwsCustomResource(this, 'MyS3FileResource', {
