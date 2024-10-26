@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { EscapeHatches } from './stacks/escape_hatches';
+import { ScopedLogging } from './stacks/scoped_logging';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new EscapeHatches(app, 'EscapeHatches', { env: devEnv });
+new ScopedLogging(app, 'EscapeHatches', { env: devEnv });
 
 app.synth();
