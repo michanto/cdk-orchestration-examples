@@ -29,42 +29,48 @@ export function testLogging(scope: Construct, msg: string | IStringProvider) {
 export class NoisyConstruct extends Construct {
   constructor(scope: Construct, id: string = 'NoisyConstruct') {
     super(scope, id);
-    testLogging(this, () => 'Hello from NoisyConstruct.');
+    testLogging(this, () => 'Hello.');
   }
 }
 
 /**
- * Demonstrate scoped logging from constructor.
+ * A CfnElement that adds nothing to the template, but demonstrates
+ * scoped logging from the constructor and _toCloudFormation.
+ *
+ * _toCloudFormation is called during synthesis.
  */
-export class LoggingCfnElement extends CfnElement {
+export class NoopCfnElement extends CfnElement {
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    Log.of(this).info('Constructor from LoggingCfnElement');
+    Log.of(this).info('Constructor called.');
   }
 
   _toCloudFormation(): object {
-    Log.of(this).info('_toCloudFormation from LoggingCfnElement');
-    return {};
+    Log.of(this).info('_toCloudFormation called.');
+    return {}; // Adds nothing to the template.
   }
 }
 
+/**
+ * Logs in constructor and during synthesis.
+ */
 export class LoggingCfnBucket extends CfnBucket {
   constructor(scope: Construct, id: string, props?: CfnBucketProps) {
     super(scope, id, props);
-    Log.of(this).info('Constructor from LoggingCfnBucket');
+    Log.of(this).info('Constructor called.');
   }
 
   _toCloudFormation(): object {
     let result = super._toCloudFormation();
-    Log.of(this).info(`LoggingCfnBucket result ${JSON.stringify(result)}`);
+    Log.of(this).info(`_toCloudFormation result ${JSON.stringify(result)}`);
 
     return new PostResolveToken(result, {
       process: (template, context) => {
         if (context.preparing) {
-          Log.of(this).info(`LoggingCfnBucket preparing ${JSON.stringify(template)}`);
+          Log.of(this).info(`_toCloudFormation preparing ${JSON.stringify(template)}`);
           return template;
         } else {
-          Log.of(this).info(`LoggingCfnBucket output ${JSON.stringify(template)}`);
+          Log.of(this).info(`_toCloudFormation output ${JSON.stringify(template)}`);
           return template;
         }
       },
@@ -92,7 +98,7 @@ export class ScopedLogging extends Stack {
 
     console.log('Before logging has been turned on for stack.');
     // These are the same methods on the console object.
-    testLogging(this, 'Hello from Stack!');
+    testLogging(this, 'Hello!');
     new NoisyConstruct(this, 'AcutallyQuiet');
 
     Logger.set(this, new Logger({
@@ -105,7 +111,7 @@ export class ScopedLogging extends Stack {
     /**
      * Write stack-scoped log lines.
      */
-    testLogging(this, 'Hello again from Stack!');
+    testLogging(this, 'Hello again!');
     console.log('');
     console.log('Noisy construct with ALL logging turned on.');
     new NoisyConstruct(this);
@@ -137,6 +143,11 @@ export class ScopedLogging extends Stack {
     console.log('Noisy construct with NoOpLogger.');
     new NoisyConstruct(subSubSubScope);
 
+
+    /**
+     * Motice the difference between the LogLevel environmnet variable
+     * in the stack template.json entry for\ each of these Lambdas.
+     */
     new InlineNodejsFunction(this, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
@@ -153,12 +164,10 @@ export class ScopedLogging extends Stack {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    console.log('');
-    console.log('A final noisty construct with ALL logging.');
-    new NoisyConstruct(this, 'AnotherNoisyConstruct');
-
-    new LoggingCfnElement(this, 'LoggingCfnElement');
-    new LoggingCfnBucket(this, 'LoggingCfnBucket');
+    new NoopCfnElement(this, 'NoopCfnElement');
+    new LoggingCfnBucket(this, 'LoggingCfnBucket', {
+      bucketName: `my-bucket-${this.account}-${this.region}`,
+    });
 
     console.log('---Scoped Logging END---');
   }

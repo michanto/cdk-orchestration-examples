@@ -282,6 +282,23 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       "Type": "AWS::IAM::Role",
     },
     "LoggingCfnBucket": {
+      "Properties": {
+        "BucketName": {
+          "Fn::Join": [
+            "",
+            [
+              "my-bucket-",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              "-",
+              {
+                "Ref": "AWS::Region",
+              },
+            ],
+          ],
+        },
+      },
       "Type": "AWS::S3::Bucket",
     },
   },

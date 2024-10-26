@@ -406,7 +406,7 @@ exports[`FindingConstructs 1`] = `
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1729969244613}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1729985333139}",
               ],
             ],
           },
@@ -807,7 +807,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "HitlStateMachine1F6B4EA3",
                 },
-                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1729969244613}",
+                "","SucceedAfterMs":3540000,"OutputPaths":[],"salt":1729985333139}",
               ],
             ],
           },
@@ -837,7 +837,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1729969244613}",
+                "","SucceedAfterMs":7080000,"Suffix":"1","OutputPaths":[],"salt":1729985333139}",
               ],
             ],
           },
@@ -867,7 +867,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "RunHitlStateMachineRunIt5945DEE1",
                 },
-                "","Suffix":"2","OutputPaths":[],"salt":1729969244613}",
+                "","Suffix":"2","OutputPaths":[],"salt":1729985333139}",
               ],
             ],
           },
