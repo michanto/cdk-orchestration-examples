@@ -2,6 +2,7 @@
 
 exports[`ScopedLogging 1`] = `
 {
+  "Description": "Stack description",
   "Parameters": {
     "BootstrapVersion": {
       "Default": "/cdk-bootstrap/hnb659fds/version",

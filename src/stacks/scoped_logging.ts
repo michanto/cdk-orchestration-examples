@@ -7,7 +7,7 @@ import {
 import {
   InlineNodejsFunction,
 } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
-import { Aspects, CfnElement, Stack, StackProps } from 'aws-cdk-lib';
+import { Aspects, CfnElement, Lazy, Stack, StackProps, Token } from 'aws-cdk-lib';
 import { CfnBucket, CfnBucketProps } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
@@ -34,20 +34,27 @@ export class NoisyConstruct extends Construct {
 }
 
 /**
- * A CfnElement that adds nothing to the template, but demonstrates
- * scoped logging from the constructor and _toCloudFormation.
+ * Demonstrates scoped logging from the constructor, _toCloudFormation,
+ * and token resolution.
  *
- * _toCloudFormation is called during synthesis.
+ * Note _toCloudFormation is called during synthesis.
  */
-export class NoopCfnElement extends CfnElement {
-  constructor(scope: Construct, id: string) {
+export class DescriptionCfnElement extends CfnElement {
+  constructor(scope: Construct, id: string, readonly description: string) {
     super(scope, id);
     Log.of(this).info('Constructor called.');
   }
 
   _toCloudFormation(): object {
     Log.of(this).info('_toCloudFormation called.');
-    return {}; // Adds nothing to the template.
+    return {
+      Description: Token.asString(Lazy.any({
+        produce: () => {
+          Log.of(this).info('Description resolved.');
+          return this.description;
+        },
+      })), // Adds nothing to the template.
+    };
   }
 }
 
@@ -60,19 +67,24 @@ export class LoggingCfnBucket extends CfnBucket {
     Log.of(this).info('Constructor called.');
   }
 
+  protected renderProperties(props: Record<string, any>): Record<string, any> {
+    Log.of(this).info('renderProperties called.');
+    let result = super.renderProperties(props);
+    Log.of(this).info(`renderProperties result ${JSON.stringify(result, undefined, 1)}`);
+    return result;
+  }
+
   _toCloudFormation(): object {
+    Log.of(this).info('_toCloudFormation called.');
     let result = super._toCloudFormation();
-    Log.of(this).info(`_toCloudFormation result ${JSON.stringify(result)}`);
+    Log.of(this).info(`_toCloudFormation result: ${JSON.stringify(result, undefined, 1)}`);
 
     return new PostResolveToken(result, {
       process: (template, context) => {
-        if (context.preparing) {
-          Log.of(this).info(`_toCloudFormation preparing ${JSON.stringify(template)}`);
-          return template;
-        } else {
-          Log.of(this).info(`_toCloudFormation output ${JSON.stringify(template)}`);
-          return template;
-        }
+        Log.of(this).info(`_toCloudFormation preparing:${
+          context.preparing
+        }: ${JSON.stringify(template, undefined, 1)}`);
+        return template;
       },
     });
   }
@@ -82,6 +94,8 @@ export class LoggingCfnBucket extends CfnBucket {
  * Scoped Logging lesson.
  */
 export class ScopedLogging extends Stack {
+  public readonly bucket: CfnBucket;
+
   constructor(scope: Construct, id: string = 'ScopedLogging', props?: StackProps) {
     super(scope, id, props);
 
@@ -164,9 +178,15 @@ export class ScopedLogging extends Stack {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    new NoopCfnElement(this, 'NoopCfnElement');
-    new LoggingCfnBucket(this, 'LoggingCfnBucket', {
-      bucketName: `my-bucket-${this.account}-${this.region}`,
+    new DescriptionCfnElement(this, 'DescriptionCfnElement', 'Stack description');
+
+    this.bucket = new LoggingCfnBucket(this, 'LoggingCfnBucket', {
+      bucketName: Lazy.string({
+        produce: () => {
+          Log.of(this.bucket).info('Resolving bucket name.');
+          return `my-bucket-${this.account}-${this.region}`;
+        },
+      }),
     });
 
     console.log('---Scoped Logging END---');
