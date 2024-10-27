@@ -7,7 +7,7 @@ import {
 import {
   InlineNodejsFunction,
 } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
-import { Aspects, CfnElement, Lazy, Stack, StackProps, Token } from 'aws-cdk-lib';
+import { Aspects, CfnElement, Lazy, Stack, StackProps } from 'aws-cdk-lib';
 import { CfnBucket, CfnBucketProps } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
@@ -48,12 +48,12 @@ export class DescriptionCfnElement extends CfnElement {
   _toCloudFormation(): object {
     Log.of(this).info('_toCloudFormation called.');
     return {
-      Description: Token.asString(Lazy.any({
+      Description: Lazy.string({
         produce: () => {
           Log.of(this).info('Description resolved.');
           return this.description;
         },
-      })), // Adds nothing to the template.
+      }, { displayHint: 'Description' }),
     };
   }
 }
@@ -81,8 +81,11 @@ export class LoggingCfnBucket extends CfnBucket {
 
     return new PostResolveToken(result, {
       process: (template, context) => {
-        Log.of(this).info(`_toCloudFormation preparing:${
-          context.preparing
+        Log.of(context.scope).info(`PostResolveToken.process: :${
+          JSON.stringify({
+            preparing: context.preparing,
+            documentPath: context.documentPath,
+          }, undefined, 1)
         }: ${JSON.stringify(template, undefined, 1)}`);
         return template;
       },

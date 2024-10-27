@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WritingConstructs 1`] = `
+exports[`EscapeHatches 1`] = `
 {
   "Description": "EscapeHatches description.
 This string will be in the stack description.
@@ -385,7 +385,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
         },
         "Timeout": "120000",
-        "salt": 1730005440475,
+        "salt": 1730047745002,
       },
       "Type": "Custom::Trigger",
       "UpdateReplacePolicy": "Delete",
@@ -443,7 +443,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
             ],
           ],
         },
-        "salt": 1730005440475,
+        "salt": 1730047745002,
       },
       "Type": "Custom::AWS",
       "UpdateReplacePolicy": "Delete",
