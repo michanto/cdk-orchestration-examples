@@ -29,7 +29,7 @@ export function testLogging(scope: Construct, msg: string | IStringProvider) {
 export class NoisyConstruct extends Construct {
   constructor(scope: Construct, id: string = 'NoisyConstruct') {
     super(scope, id);
-    testLogging(this, () => 'Hello.');
+    testLogging(this, () => 'Constructor called.');
   }
 }
 
@@ -47,7 +47,7 @@ export class DescriptionCfnElement extends CfnElement {
 
   _toCloudFormation(): object {
     Log.of(this).info('_toCloudFormation called.');
-    return {
+    let result = {
       Description: Lazy.string({
         produce: () => {
           Log.of(this).info('Description resolved.');
@@ -55,6 +55,8 @@ export class DescriptionCfnElement extends CfnElement {
         },
       }, { displayHint: 'Description' }),
     };
+    Log.of(this).info(`_toCloudFormation result ${JSON.stringify(result, undefined, 1)}`);
+    return result;
   }
 }
 
@@ -79,7 +81,7 @@ export class LoggingCfnBucket extends CfnBucket {
     let result = super._toCloudFormation();
     Log.of(this).info(`_toCloudFormation result: ${JSON.stringify(result, undefined, 1)}`);
 
-    return new PostResolveToken(result, {
+    let prt = new PostResolveToken(result, {
       process: (template, context) => {
         Log.of(context.scope).info(`PostResolveToken.process: :${
           JSON.stringify({
@@ -90,6 +92,8 @@ export class LoggingCfnBucket extends CfnBucket {
         return template;
       },
     });
+    Log.of(this).info(`_toCloudFormation PostResolveToken: ${prt}`);
+    return result;
   }
 }
 
