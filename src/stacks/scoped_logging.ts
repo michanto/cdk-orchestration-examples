@@ -70,7 +70,9 @@ export class LoggingCfnBucket extends CfnBucket {
   }
 
   protected renderProperties(props: Record<string, any>): Record<string, any> {
-    Log.of(this).info('renderProperties called.');
+    Log.of(this).info(`renderProperties called with props ${
+      JSON.stringify(props, undefined, 1)
+    }.`);
     let result = super.renderProperties(props);
     Log.of(this).info(`renderProperties result ${JSON.stringify(result, undefined, 1)}`);
     return result;
