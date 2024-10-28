@@ -84,7 +84,7 @@ export class LoggingCfnBucket extends CfnBucket {
 
     let prt = new PostResolveToken(result, {
       process: (template, context) => {
-        Log.of(context.scope).info(`PostResolveToken.process: :${
+        Log.of(context.scope).info(`PostResolveToken.process: ${
           JSON.stringify({
             preparing: context.preparing,
             documentPath: context.documentPath,
