@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new ScopedLogging(app, 'EscapeHatches', { env: devEnv });
+new ScopedLogging(app, 'ScopedLogging', { env: devEnv });
 
 app.synth();

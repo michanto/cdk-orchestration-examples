@@ -9,7 +9,7 @@ import {
 } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { Aspects, CfnElement, Lazy, Stack, StackProps } from 'aws-cdk-lib';
 import { CfnBucket, CfnBucketProps } from 'aws-cdk-lib/aws-s3';
-import { Construct } from 'constructs';
+import { Construct, IConstruct } from 'constructs';
 
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 
@@ -77,9 +77,10 @@ export class LoggingCfnBucket extends CfnBucket {
   }
 
   _toCloudFormation(): object {
-    Log.of(this).info('_toCloudFormation called.');
+    let log = Log.of(this);
+    log.info('_toCloudFormation called.');
     let result = super._toCloudFormation();
-    Log.of(this).info(`_toCloudFormation result: ${JSON.stringify(result, undefined, 1)}`);
+    log.info(`_toCloudFormation result: ${JSON.stringify(result, undefined, 1)}`);
 
     let prt = new PostResolveToken(result, {
       process: (template, context) => {
@@ -93,7 +94,7 @@ export class LoggingCfnBucket extends CfnBucket {
       },
     });
     Log.of(this).info(`_toCloudFormation PostResolveToken: ${prt}`);
-    return result;
+    return prt;
   }
 }
 
@@ -107,7 +108,12 @@ export class ScopedLogging extends Stack {
     super(scope, id, props);
 
     // This will add LogLevel environment varible to all Functions.
-    Aspects.of(this).add(new LoggingAspect());
+    Aspects.of(this).add(new class extends LoggingAspect {
+      visit(node: IConstruct): void {
+        Log.of(node).info('visiting');
+        super.visit(node);
+      }
+    }());
 
     // NOTE:  Below console.log lines are meant as comments in the output.
     // Calls to Log.of indicate lesson code.
