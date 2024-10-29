@@ -39,10 +39,10 @@ export class NoisyConstruct extends Construct {
  *
  * Note _toCloudFormation is called during synthesis.
  */
-export class DescriptionCfnElement extends CfnElement {
+export class StackDescription extends CfnElement {
   constructor(scope: Construct, id: string, readonly description: string) {
     super(scope, id);
-    Log.of(this).info('Constructor called.');
+    Log.of(this).info(`Constructor called with description '${description}'.`);
   }
 
   _toCloudFormation(): object {
@@ -50,7 +50,7 @@ export class DescriptionCfnElement extends CfnElement {
     let result = {
       Description: Lazy.string({
         produce: () => {
-          Log.of(this).info('Description resolved.');
+          Log.of(this).info(`Description resolved to '${this.description}'.`);
           return this.description;
         },
       }, { displayHint: 'Description' }),
@@ -66,15 +66,17 @@ export class DescriptionCfnElement extends CfnElement {
 export class LoggingCfnBucket extends CfnBucket {
   constructor(scope: Construct, id: string, props?: CfnBucketProps) {
     super(scope, id, props);
-    Log.of(this).info('Constructor called.');
+    Log.of(this).info(`Constructor called with props: ${
+      props ? JSON.stringify(props, undefined, 1) : 'undefined'
+    }.`);
   }
 
   protected renderProperties(props: Record<string, any>): Record<string, any> {
-    Log.of(this).info(`renderProperties called with props ${
+    Log.of(this).info(`renderProperties called with props: ${
       JSON.stringify(props, undefined, 1)
     }.`);
     let result = super.renderProperties(props);
-    Log.of(this).info(`renderProperties result ${JSON.stringify(result, undefined, 1)}`);
+    Log.of(this).info(`renderProperties result: ${JSON.stringify(result, undefined, 1)}`);
     return result;
   }
 
@@ -84,19 +86,19 @@ export class LoggingCfnBucket extends CfnBucket {
     let result = super._toCloudFormation();
     log.info(`_toCloudFormation result: ${JSON.stringify(result, undefined, 1)}`);
 
-    let prt = new PostResolveToken(result, {
+    let postResolveToken = new PostResolveToken(result, {
       process: (template, context) => {
-        Log.of(context.scope).info(`PostResolveToken.process: ${
+        Log.of(context.scope).info(`PostResolveToken.process context = ${
           JSON.stringify({
             preparing: context.preparing,
             documentPath: context.documentPath,
           }, undefined, 1)
-        }: ${JSON.stringify(template, undefined, 1)}`);
+        }\n  template = ${JSON.stringify(template, undefined, 1)}`);
         return template;
       },
     });
-    Log.of(this).info(`_toCloudFormation PostResolveToken: ${prt}`);
-    return prt;
+    Log.of(this).info(`_toCloudFormation PostResolveToken: ${postResolveToken}`);
+    return postResolveToken;
   }
 }
 
@@ -109,101 +111,97 @@ export class ScopedLogging extends Stack {
   constructor(scope: Construct, id: string = 'ScopedLogging', props?: StackProps) {
     super(scope, id, props);
 
-    // This will add LogLevel environment varible to all Functions.
-    Aspects.of(this).add(new class extends LoggingAspect {
+    console.log('//-- **** ScopedLogging constructor BEGIN ****');
+
+    /**
+     * LoggingAspect adds a 'LogLevel' environment varible to all Functions that matches
+     * the LogLevel for the construct.  It is omitted if the LogLevel is OFF (0).
+     */
+    Aspects.of(this).add(new class LoggingAspectThatLogs extends LoggingAspect {
       visit(node: IConstruct): void {
         Log.of(node).info('visiting');
         super.visit(node);
       }
     }());
 
-    // NOTE:  Below console.log lines are meant as comments in the output.
-    // Calls to Log.of indicate lesson code.
+
+    console.log('//-- Before logging has been turned on for stack.');
     /**
-     * Mark the beginning and end of the constructor to
-     * make it easier to find in the build output.
+     * Write stack-scoped log lines.
      */
-    console.log('---Scoped Logging---');
-
-    console.log('Before logging has been turned on for stack.');
-    // These are the same methods on the console object.
     testLogging(this, 'Hello!');
-    new NoisyConstruct(this, 'AcutallyQuiet');
+    new NoisyConstruct(this, 'ActuallyQuiet');
 
+    console.log('//-- Set stack logging level to ALL and re-run test.');
     Logger.set(this, new Logger({
       logLevel: LogLevel.ALL,
     }));
-
-    console.log('');
-    console.log('After logging has been turned on for stack.');
 
     /**
      * Write stack-scoped log lines.
      */
     testLogging(this, 'Hello again!');
-    console.log('');
-    console.log('Noisy construct with ALL logging turned on.');
     new NoisyConstruct(this);
     console.log('');
 
     /**
-     * Create a sub-scope
+     * Create sub-scopes with differnt logging and add NoistyConstruct to them.
+     *
+     * Note that the sub-scopes are all nested, which makes for long LogicalIDs for the
+     * Lambda functions we are going to add.
      */
-    let subScope = new Construct(this, 'InfoScope');
-    Logger.set(subScope, new Logger({
+    let infoScope = new Construct(this, 'InfoScope');
+    Logger.set(infoScope, new Logger({
       logLevel: LogLevel.INFO,
     }));
     // Write SubScope log lines.
-    testLogging(subScope, 'Hello from SubScope!');
-    console.log('Noisy construct with INFO logging turned on.');
-    new NoisyConstruct(subScope);
+    testLogging(infoScope, 'Hello friend!');
+    new NoisyConstruct(infoScope);
 
-    let subSubScope = new Construct(subScope, 'ErrorScope');
-    Logger.set(subSubScope, new Logger({
+    let errorScope = new Construct(infoScope, 'ErrorScope');
+    Logger.set(errorScope, new Logger({
       logLevel: LogLevel.ERROR,
     }));
-    console.log('');
-    console.log('Noisy construct with ERROR logging turned on.');
-    new NoisyConstruct(subSubScope);
+    new NoisyConstruct(errorScope);
 
-    let subSubSubScope = new Construct(subSubScope, 'NoLoggingScope');
-    Logger.set(subSubSubScope, new NoOpLogger());
-    console.log('');
-    console.log('Noisy construct with NoOpLogger.');
-    new NoisyConstruct(subSubSubScope);
-
+    let noLogScope = new Construct(errorScope, 'NoLogScope');
+    Logger.set(noLogScope, new NoOpLogger());
+    new NoisyConstruct(noLogScope);
 
     /**
      * Motice the difference between the LogLevel environmnet variable
-     * in the stack template.json entry for\ each of these Lambdas.
+     * in the stack template.json entry for each of these Lambdas.
+     *
+     * Also note that the LogicalIds quickly get confusing to read.
+     * The CloudFormation produced by the CDK is barely readable sometimes.
      */
     new InlineNodejsFunction(this, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    new InlineNodejsFunction(subScope, 'EchoLambdaSubScope', {
+    new InlineNodejsFunction(infoScope, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    new InlineNodejsFunction(subSubScope, 'EchoLambdaSubSubScope', {
+    new InlineNodejsFunction(errorScope, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    new InlineNodejsFunction(subSubSubScope, 'EchoLambdaSubSubSubScope', {
+    new InlineNodejsFunction(noLogScope, 'EchoLambda', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
 
-    new DescriptionCfnElement(this, 'DescriptionCfnElement', 'Stack description');
+    new StackDescription(this, 'StackDescription', 'The road goes ever on and on.');
 
     this.bucket = new LoggingCfnBucket(this, 'LoggingCfnBucket', {
       bucketName: Lazy.string({
         produce: () => {
-          Log.of(this.bucket).info('Resolving bucket name.');
+          Log.of(this.bucket).info('Resolving bucketName.');
           return `my-bucket-${this.account}-${this.region}`;
         },
-      }),
+      }, { displayHint: 'BucketName' }),
     });
 
-    console.log('---Scoped Logging END---');
+    console.log('//-- **** ScopedLogging constructor END ****');
   }
 }

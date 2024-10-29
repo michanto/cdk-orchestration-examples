@@ -2,7 +2,7 @@
 
 exports[`ScopedLogging 1`] = `
 {
-  "Description": "Stack description",
+  "Description": "The road goes ever on and on.",
   "Parameters": {
     "BootstrapVersion": {
       "Default": "/cdk-bootstrap/hnb659fds/version",
@@ -79,9 +79,9 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "InfoScopeEchoLambdaSubScope1DC4E878": {
+    "InfoScopeEchoLambda6A8623C0": {
       "DependsOn": [
-        "InfoScopeEchoLambdaSubScopeServiceRole7071C26E",
+        "InfoScopeEchoLambdaServiceRole28105969",
       ],
       "Properties": {
         "Code": {
@@ -108,7 +108,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "InfoScopeEchoLambdaSubScopeServiceRole7071C26E",
+            "InfoScopeEchoLambdaServiceRole28105969",
             "Arn",
           ],
         },
@@ -116,7 +116,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::Lambda::Function",
     },
-    "InfoScopeEchoLambdaSubScopeServiceRole7071C26E": {
+    "InfoScopeEchoLambdaServiceRole28105969": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -147,9 +147,9 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "InfoScopeErrorScopeEchoLambdaSubSubScope65FB6A05": {
+    "InfoScopeErrorScopeEchoLambdaE77085EA": {
       "DependsOn": [
-        "InfoScopeErrorScopeEchoLambdaSubSubScopeServiceRole26069713",
+        "InfoScopeErrorScopeEchoLambdaServiceRole4227D82C",
       ],
       "Properties": {
         "Code": {
@@ -176,7 +176,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "InfoScopeErrorScopeEchoLambdaSubSubScopeServiceRole26069713",
+            "InfoScopeErrorScopeEchoLambdaServiceRole4227D82C",
             "Arn",
           ],
         },
@@ -184,7 +184,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::Lambda::Function",
     },
-    "InfoScopeErrorScopeEchoLambdaSubSubScopeServiceRole26069713": {
+    "InfoScopeErrorScopeEchoLambdaServiceRole4227D82C": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -215,9 +215,9 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "InfoScopeErrorScopeNoLoggingScopeEchoLambdaSubSubSubScope7DCA4843": {
+    "InfoScopeErrorScopeNoLogScopeEchoLambdaB1E2DC3B": {
       "DependsOn": [
-        "InfoScopeErrorScopeNoLoggingScopeEchoLambdaSubSubSubScopeServiceRoleDA6C8450",
+        "InfoScopeErrorScopeNoLogScopeEchoLambdaServiceRole4A45A1E6",
       ],
       "Properties": {
         "Code": {
@@ -243,7 +243,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "InfoScopeErrorScopeNoLoggingScopeEchoLambdaSubSubSubScopeServiceRoleDA6C8450",
+            "InfoScopeErrorScopeNoLogScopeEchoLambdaServiceRole4A45A1E6",
             "Arn",
           ],
         },
@@ -251,7 +251,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::Lambda::Function",
     },
-    "InfoScopeErrorScopeNoLoggingScopeEchoLambdaSubSubSubScopeServiceRoleDA6C8450": {
+    "InfoScopeErrorScopeNoLogScopeEchoLambdaServiceRole4A45A1E6": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
