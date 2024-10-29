@@ -3,6 +3,7 @@ import {
   Log, Logger, LoggingAspect, LogLevel,
   NoOpLogger,
   PostResolveToken,
+  TreeInspectable,
 } from '@michanto/cdk-orchestration';
 import {
   InlineNodejsFunction,
@@ -103,6 +104,21 @@ export class LoggingCfnBucket extends CfnBucket {
 }
 
 /**
+ * LoggingAspect adds a 'LogLevel' environment varible to all Functions that matches
+ * the LogLevel for the construct.  It is omitted if the LogLevel is OFF (0).
+ *
+ * Additionally, this version logs to the console and adds to tree.json.
+ */
+export class LoggingAspectThatLogs extends LoggingAspect {
+  visit(node: IConstruct): void {
+    let logLevel = Logger.of(node).logLevel;
+    Log.of(node).info(`visiting node with LogLevel = ${logLevel}`);
+    TreeInspectable.of(node).addAttribute('Logger.of(node).logLevel', logLevel);
+    super.visit(node);
+  }
+}
+
+/**
  * Scoped Logging lesson.
  */
 export class ScopedLogging extends Stack {
@@ -113,16 +129,7 @@ export class ScopedLogging extends Stack {
 
     console.log('//-- **** ScopedLogging constructor BEGIN ****');
 
-    /**
-     * LoggingAspect adds a 'LogLevel' environment varible to all Functions that matches
-     * the LogLevel for the construct.  It is omitted if the LogLevel is OFF (0).
-     */
-    Aspects.of(this).add(new class LoggingAspectThatLogs extends LoggingAspect {
-      visit(node: IConstruct): void {
-        Log.of(node).info('visiting');
-        super.visit(node);
-      }
-    }());
+    Aspects.of(this).add(new LoggingAspectThatLogs());
 
 
     console.log('//-- Before logging has been turned on for stack.');
