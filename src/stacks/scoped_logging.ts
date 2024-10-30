@@ -41,20 +41,22 @@ export class NoisyConstruct extends Construct {
  * Note _toCloudFormation is called during synthesis.
  */
 export class StackDescription extends CfnElement {
-  constructor(scope: Construct, id: string, readonly description: string) {
+  readonly description: string;
+  constructor(scope: Construct, id: string, description: string) {
     super(scope, id);
     Log.of(this).info(`Constructor called with description '${description}'.`);
+    this.description = Lazy.string({
+      produce: () => {
+        Log.of(this).info(`Description resolved to '${description}'.`);
+        return description;
+      },
+    }, { displayHint: 'Description' });
   }
 
   _toCloudFormation(): object {
     Log.of(this).info('_toCloudFormation called.');
     let result = {
-      Description: Lazy.string({
-        produce: () => {
-          Log.of(this).info(`Description resolved to '${this.description}'.`);
-          return this.description;
-        },
-      }, { displayHint: 'Description' }),
+      Description: this.description,
     };
     Log.of(this).info(`_toCloudFormation result ${JSON.stringify(result, undefined, 1)}`);
     return result;

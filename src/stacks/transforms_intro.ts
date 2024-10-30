@@ -10,7 +10,8 @@ const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 /**
  * Transform that adds Environment variables to functions.
  *
- * Note that this could be done as an Aspect.  For demo purposes.
+ * Note that this could be done as an Aspect calling addEnvironment, albeit with a different
+ * user experience.  For demo purposes.
  */
 export class EnvironmentVariableAdder extends Transform {
   constructor(scope: Construct, id: string, readonly environment: Record<string, string>) {
