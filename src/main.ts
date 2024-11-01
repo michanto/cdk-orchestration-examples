@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { ScopedLogging } from './stacks/scoped_logging';
+import { TransformsIntro } from './stacks/transforms_intro';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new ScopedLogging(app, 'ScopedLogging', { env: devEnv });
+new TransformsIntro(app, 'TransformsIntro', { env: devEnv });
 
 app.synth();
