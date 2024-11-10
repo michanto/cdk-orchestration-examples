@@ -1,12 +1,12 @@
 import { TemplateImporter } from '@michanto/cdk-orchestration/cloudformation-include';
-import { CfTemplateType, StringReplacer, Transform } from '@michanto/cdk-orchestration/transforms';
+import { CfJsonType, StringReplacer, Transform } from '@michanto/cdk-orchestration/transforms';
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { IRole, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnStateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
 
 export class DescriptionRemover extends Transform {
-  public apply(template: CfTemplateType): CfTemplateType {
+  public apply(template: CfJsonType): CfJsonType {
     delete template.Description;
     return template;
   }

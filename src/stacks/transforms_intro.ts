@@ -1,11 +1,13 @@
 import { Log, Logger, LogLevel } from '@michanto/cdk-orchestration';
 import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { CustomResourceUtilities } from '@michanto/cdk-orchestration/custom-resources';
-import { CfTemplateType, Echo, ImportOrders, Transform } from '@michanto/cdk-orchestration/transforms';
+import { CfJsonType, Echo, Joiner, Transform } from '@michanto/cdk-orchestration/transforms';
 import { Aws, Stack, StackProps } from 'aws-cdk-lib';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { StateMachine, DefinitionBody } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
 import { GreetingLambdaTask } from '../constructs/greeting_lambda_task';
+import { HitlTestStepFunctionDefinition } from '../constructs/hitl_test_step_fn';
 
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 
@@ -34,7 +36,7 @@ export class EnvironmentVariableAdder extends Transform {
     super(scope, id);
   }
 
-  apply(template: CfTemplateType): CfTemplateType {
+  apply(template: CfJsonType): CfJsonType {
     let numberChanged = 0;
     for (let res in template.Resources) {
       if (template.Resources[res].Type == 'AWS::Lambda::Function') {
@@ -46,20 +48,24 @@ export class EnvironmentVariableAdder extends Transform {
         };
         numberChanged++;
       }
-      if (!numberChanged) {
-        Log.of(this).error('No functions found.  No environment variables added.');
-      }
-      Log.of(this).debug(`Added environment variables to ${numberChanged} functions.`);
     }
+    if (!numberChanged) {
+      Log.of(this).error('No functions found.  No environment variables added.');
+    }
+    Log.of(this).debug(`Added environment variables to ${numberChanged} functions.`);
     return template;
   }
 }
 
 /**
+ * TransformsIntro lesson.
+ *
+ * Introduces the concept of Transforms and how they work.
  */
 export class TransformsIntro extends Stack {
   constructor(scope: Construct, id: string = 'TransformsInfo', props?:StackProps) {
     super(scope, id, props);
+    console.log('TransformsIntro constructor BEGIN');
     Logger.set(this, new Logger({ logLevel: LogLevel.DEBUG }));
 
     let bucket = new Bucket(this, 'MyBucket', {
@@ -70,6 +76,9 @@ export class TransformsIntro extends Stack {
      * before Stack transforms are called.
      */
     new Echo(bucket, 'BucketEcho');
+    new Joiner(bucket);
+    new Echo(bucket, 'EchoAfterJoin');
+
     let functionOne = new InlineNodejsFunction(this, 'FunctionOne', {
       entry: `${LAMBDA_PATH}/echo.js`,
       environment: {
@@ -108,10 +117,15 @@ export class TransformsIntro extends Stack {
       greeting: 'Hello, everyone!',
     });
     new CustomResourceEcho(task, 'TaskEcho');
-    new class FinalEcho extends CustomResourceEcho {
-      get order() {
-        return ImportOrders.WRITER;
-      }
-    }(task, 'FinalTaskEcho');
+    const succeedStepFunction = new HitlTestStepFunctionDefinition(this, 'HitlStepFunction', {
+      successMode: true,
+    });
+    let sm1 = new StateMachine(this, 'MockHitlStateMachine', {
+      definitionBody: DefinitionBody.fromChainable(succeedStepFunction),
+    });
+    new Echo(sm1, 'Echo');
+    new Joiner(sm1);
+    new Echo(sm1, 'EchoAfterJoin');
+    console.log('TransformsIntro constructor END');
   }
 }

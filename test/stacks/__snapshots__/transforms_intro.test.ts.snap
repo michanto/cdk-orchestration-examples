@@ -143,7 +143,7 @@ exports[`WritingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "53bffefaf92adf01057e890f9fc1cd2cf0e81b6bcc0664b8257d8a6f530177f6.zip",
+          "S3Key": "8f053a9a22dbc606ddb0579d0d73823b801423cc03c73226735b3198b1e3ca2c.zip",
         },
         "Environment": {
           "Variables": {
@@ -561,7 +561,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                 {
                   "Ref": "GreetingLambdaTaskReverse66C94AF9",
                 },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1730494746733}",
+                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1731201249414}",
               ],
             ],
           },
@@ -681,6 +681,167 @@ Greeting: result,
         ],
       },
       "Type": "AWS::IAM::Role",
+    },
+    "HitlStepFunctionEchoLambda20867270": {
+      "DependsOn": [
+        "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+if (process.env.LogLevel) {
+console.log(JSON.stringify(message));
+}
+}
+async function handler(event, context) {
+log({ Event: event });
+log({ Context: context });
+return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+            "LogLevel": "1",
+            "MOUNTAIN": "Taniquetil",
+            "SPIDER": "Ungoliant",
+          },
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MockHitlStateMachine1D7D3E53": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "MockHitlStateMachineRoleDefaultPolicyB4C117F2",
+        "MockHitlStateMachineRole38B152A8",
+      ],
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "",
+            [
+              "{"StartAt":"AreRunsComplete?","States":{"AreRunsComplete?":{"Type":"Pass","Result":{"s3Uri":"s3://hitl-test-runs/runs/hitl-host-02/2024-05-10T10:38:27Z/15a85c7d-d7ca-43b4-906a-818488f39177","allRunsComplete":true,"allRunsSuccessful":true},"Next":"EchoStep"},"EchoStep":{"Next":"AreRunsSuccessful?","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","Resource":"",
+              {
+                "Fn::GetAtt": [
+                  "HitlStepFunctionEchoLambda20867270",
+                  "Arn",
+                ],
+              },
+              ""},"AreRunsSuccessful?":{"Type":"Choice","Choices":[{"And":[{"Variable":"$.allRunsComplete","BooleanEquals":true},{"Variable":"$.allRunsSuccessful","BooleanEquals":true}],"Next":"SucceedStep"}],"Default":"FailStep"},"FailStep":{"Type":"Fail","Comment":"All runs complete but not successful","CausePath":"States.JsonToString($)"},"SucceedStep":{"Type":"Succeed","Comment":"All runs complete and successful"}}}",
+            ],
+          ],
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "MockHitlStateMachineRole38B152A8",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::StepFunctions::StateMachine",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MockHitlStateMachineRole38B152A8": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "states.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MockHitlStateMachineRoleDefaultPolicyB4C117F2": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "HitlStepFunctionEchoLambda20867270",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "HitlStepFunctionEchoLambda20867270",
+                          "Arn",
+                        ],
+                      },
+                      ":*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MockHitlStateMachineRoleDefaultPolicyB4C117F2",
+        "Roles": [
+          {
+            "Ref": "MockHitlStateMachineRole38B152A8",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "MyBucketF68F3FF0": {
       "DeletionPolicy": "Retain",
