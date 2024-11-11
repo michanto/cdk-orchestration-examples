@@ -4,7 +4,7 @@ exports[`StackProvenanceExample 1`] = `
 {
   "Metadata": {
     "build_hostname": "michael-Virtual-Machine",
-    "build_timestamp": 1731295432299,
+    "build_timestamp": 1731294054943,
     "build_user": "michael",
   },
   "Parameters": {
@@ -15,7 +15,7 @@ exports[`StackProvenanceExample 1`] = `
     },
   },
   "Resources": {
-    "EnsureChangeInStackD44887A6": {
+    "EnsureChangeInStackB671AB8A": {
       "Type": "AWS::CloudFormation::WaitConditionHandle",
     },
   },

@@ -10,7 +10,7 @@ exports[`SingletonExample 1`] = `
     },
   },
   "Resources": {
-    "EnsureChangeInStack08D0AC1D": {
+    "EnsureChangeInStackB671AB8A": {
       "Type": "AWS::CloudFormation::WaitConditionHandle",
     },
     "SingletonFunction5AE874D4": {
