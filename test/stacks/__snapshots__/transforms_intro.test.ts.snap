@@ -143,7 +143,7 @@ exports[`WritingConstructs 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "ef3ecbba9102af2e5a9146060ca2e53c50c3a498872a254f34da8c839e397b1c.zip",
+          "S3Key": "3aa61e21c6891872655937328a6920a8bb2146166790237d55e789931f75b60c.zip",
         },
         "Environment": {
           "Variables": {

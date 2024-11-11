@@ -2058,10 +2058,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@michanto/cdk-orchestration@^0.1.25":
-  version "0.1.25"
-  resolved "https://registry.yarnpkg.com/@michanto/cdk-orchestration/-/cdk-orchestration-0.1.25.tgz#a84d190a03bce7d1677788aaeb9fae1bb6f89991"
-  integrity sha512-J7+Yw0MWc3R7NV8UP5/D+Lyw8edjF7XHWLFoqUUTv1/RXvGxZeoEf5MzrfXnqtMCYh/BjGVaNi6QNmtYkUXd0A==
+"@michanto/cdk-orchestration@^0.1.26":
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/@michanto/cdk-orchestration/-/cdk-orchestration-0.1.26.tgz#766b806346b22a273c9ff9d1417baf4576d1eeab"
+  integrity sha512-7W6Pa2p7NNZlIJXpvkJRf5H8EWIaojBvKfbUzJGFRJAb/9WzoXvAVmVfszBjjU1Db+rixXOVP3BOoCyHmDTX9Q==
   dependencies:
     "@aws-sdk/client-ec2" "3.501.0"
     "@aws-sdk/client-lambda" "3.501.0"
