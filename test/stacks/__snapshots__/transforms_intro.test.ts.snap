@@ -227,7 +227,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           "Fn::Join": [
             "",
             [
-              "my-bucket-",
+              "my-vault-",
               {
                 "Ref": "AWS::AccountId",
               },

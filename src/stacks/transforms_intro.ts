@@ -8,6 +8,25 @@ import { Construct } from 'constructs';
 const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
 
 /**
+ * Changes 'bucket' in the bucket name to 'vault'.
+ */
+export class BucketToVault extends Transform {
+  constructor(scope: Construct, id: string = 'BucketToVault') {
+    super(scope, id);
+  }
+
+  apply(template: CfJsonType): CfJsonType {
+    for (let res in template.Resources) {
+      if (template.Resources[res].Properties.BucketName) {
+        template.Resources[res].Properties.BucketName =
+          template.Resources[res].Properties.BucketName.split('bucket').join('vault');
+      }
+    }
+    return template;
+  }
+}
+
+/**
  * Transform that adds Environment variables to functions.
  *
  * Note that this could be done as an Aspect calling addEnvironment, albeit with a different
@@ -40,24 +59,6 @@ export class EnvironmentVariableAdder extends Transform {
 }
 
 /**
- * Changes 'bucket' in the bucket name to 'vault'.
- */
-export class BucketToVault extends Transform {
-  constructor(scope: Construct, id: string = 'BucketToVault') {
-    super(scope, id);
-  }
-
-  apply(template: CfJsonType): CfJsonType {
-    for (let res in template.Resources) {
-      if (template.Resources[res].Properties.BucketName) {
-        template.Resources[res].Properties.BucketName.split('bucket').join('vault');
-      }
-    }
-    return template;
-  }
-}
-
-/**
  * TransformsIntro lesson.
  *
  * Introduces the concept of Transforms and how they work.
@@ -73,21 +74,33 @@ export class TransformsIntro extends Stack {
     });
 
     /**
-     * This Echo transform will be called when Stack._toCloudFormation is called, after all the
-     * CfnElements have been processed.
-     *
-     * Note this needs to be added last to reflect all other stack-level transforms.
-     */
-    new Echo(this, 'StackEcho');
-
-    /**
      * This will be called during synthesis when MyBuckets CfnBucket._toCloudFormation method is called,
      * before Stack transforms are called.
      */
     new Echo(bucket, 'BucketEcho');
     new Joiner(bucket);
-    new BucketToVault(bucket);
     new Echo(bucket, 'EchoAfterJoin');
+    new BucketToVault(bucket);
+    new Echo(bucket, 'EchoAfterVault');
+
+    /**
+     * This EnvironmentVariableAdder Transform will be called when
+     * Stack._toCloudFormation is called, after all the CfnElement
+     * Transforms have been processed.
+     */
+    new EnvironmentVariableAdder(this, 'GeneralVariables', {
+      SPIDER: 'Ungoliant',
+      MOUNTAIN: 'Taniquetil',
+    });
+
+    /**
+     * This Echo Transform will be called when Stack._toCloudFormation is called, after all the
+     * CfnElements have been processed.
+     *
+     * Note this needs to be added as the last stack-level transform
+     * to reflect all other stack-level transforms.
+     */
+    new Echo(this, 'StackEcho');
 
     let functionOne = new InlineNodejsFunction(this, 'FunctionOne', {
       entry: `${LAMBDA_PATH}/echo.js`,
@@ -104,15 +117,17 @@ export class TransformsIntro extends Stack {
     new InlineNodejsFunction(this, 'FunctionThree', {
       entry: `${LAMBDA_PATH}/echo.js`,
     });
+
+    /**
+     * This CfnResource level transform will be applied before all stack level transforms.
+     */
     new EnvironmentVariableAdder(functionOne, 'F1SpecificVariables', {
       ELF: 'Arondir',
       MOUNTAIN: 'Thangorodrim',
       HOBBIT: 'Drogo',
     });
-    new EnvironmentVariableAdder(this, 'GeneralVariables', {
-      SPIDER: 'Ungoliant',
-      MOUNTAIN: 'Taniquetil',
-    });
+
+    console.log('TransformsIntro constructor END');
   }
 }
 
