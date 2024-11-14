@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WritingConstructs 1`] = `
+exports[`TransformsIntro 1`] = `
 {
   "Parameters": {
     "BootstrapVersion": {

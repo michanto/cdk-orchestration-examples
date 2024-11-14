@@ -1,11 +1,11 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { TransformsIntro } from '../../src/stacks/transforms_intro';
+import { OrderedTransforms } from '../../src/stacks/ordered_transforms';
 import { NormalizeSnapshot } from '../test_utils';
 
-test('TransformsIntro', () => {
+test('OrderedTransforms', () => {
   const app = new App();
-  const stack = new TransformsIntro(app);
+  const stack = new OrderedTransforms(app);
   new NormalizeSnapshot(stack);
 
   const template = Template.fromStack(stack);

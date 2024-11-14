@@ -6,7 +6,6 @@ import { Construct } from 'constructs';
 import { GreetingLambdaTask } from '../constructs/greeting_lambda_task';
 import { HitlTestStepFunctionDefinition } from '../constructs/hitl_test_step_fn';
 
-
 /**
  * Echo is a Transform, and Transforms work out-of-the-box with L1 or L2 constructs.
  * Otherwise, the default is for a transform to be applied to the stack.
@@ -32,7 +31,7 @@ export class EchoCustomResourceAfterEncode extends Echo {
   }
 }
 
-export class OrderedTransformsIntro extends Stack {
+export class OrderedTransforms extends Stack {
   constructor(scope: Construct, id: string = 'TransformsInfo', props?: StackProps) {
     super(scope, id, props);
     /**
