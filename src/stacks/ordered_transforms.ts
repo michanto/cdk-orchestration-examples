@@ -20,14 +20,10 @@ export class EchoCustomResource extends Echo {
   }
 }
 
-export class EchoCustomResourceAfterEncode extends Echo {
+export class EchoCustomResourceAfterEncode extends EchoCustomResource {
   get order() {
     // Encode runs in WRITER order.
     return ImportOrders.WRITER;
-  }
-
-  get target() {
-    return new CustomResourceUtilities().findCustomResource(this.node.scope!);
   }
 }
 

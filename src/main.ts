@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { TransformsIntro } from './stacks/transforms_intro';
+import { OrderedTransforms } from './stacks/ordered_transforms';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new TransformsIntro(app, 'TransformsIntro', { env: devEnv });
+new OrderedTransforms(app, 'OrderedTransforms', { env: devEnv });
 
 app.synth();
