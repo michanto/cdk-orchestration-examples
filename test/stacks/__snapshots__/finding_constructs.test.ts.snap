@@ -379,6 +379,64 @@ exports[`FindingConstructs 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
+    "EchoStepFunction": {
+      "Properties": {
+        "DefinitionString": "{
+  "StartAt": "MyPassState",
+  "States": {
+    "MyPassState": {
+      "Type": "Pass",
+      "Next": "Wait for 3 seconds"
+    },
+    "Wait for 3 seconds": {
+      "Seconds": 3,
+      "Type": "Wait",
+      "Next": "Convert HelloWorld to Base64"
+    },
+    "Echo Input to Output": {
+      "Parameters": {
+        "FunctionName": "EchoInput",
+        "Payload": {
+          "input": "Hello, world!"
+        }
+      },
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Type": "Task",
+      "End": true,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 2,
+          "BackoffRate": 4.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "LambdaTaskFailed"
+        }
+      ]
+    },
+    "LambdaTaskFailed": {
+      "Type": "Fail"
+    }
+  }
+}",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "PyStepFunctionsImportSFRole7AFE3505",
+            "Arn",
+          ],
+        },
+        "StateMachineName": "EchoInput",
+      },
+      "Type": "AWS::StepFunctions::StateMachine",
+    },
     "GreetingLambdaTask6113D194": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
@@ -773,6 +831,74 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Policy",
     },
+    "PyStepFunctionsImportEchoInputLambdaC8ED2CC0": {
+      "DependsOn": [
+        "PyStepFunctionsImportEchoInputLambdaServiceRole9DFA95F6",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = handler;
+function log(message) {
+if (process.env.LogLevel) {
+console.log(JSON.stringify(message));
+}
+}
+async function handler(event, context) {
+log({ Event: event });
+log({ Context: context });
+return Promise.resolve(event !== null && event !== void 0 ? event : {});
+}",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "FunctionName": "EchoInput",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "PyStepFunctionsImportEchoInputLambdaServiceRole9DFA95F6",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "PyStepFunctionsImportEchoInputLambdaServiceRole9DFA95F6": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
     "PyStepFunctionsImportSFRole7AFE3505": {
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -789,6 +915,48 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
         },
       },
       "Type": "AWS::IAM::Role",
+    },
+    "PyStepFunctionsImportSFRoleDefaultPolicyAE5482BD": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "PyStepFunctionsImportEchoInputLambdaC8ED2CC0",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "PyStepFunctionsImportEchoInputLambdaC8ED2CC0",
+                          "Arn",
+                        ],
+                      },
+                      ":*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "PyStepFunctionsImportSFRoleDefaultPolicyAE5482BD",
+        "Roles": [
+          {
+            "Ref": "PyStepFunctionsImportSFRole7AFE3505",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "RunHitlStateMachineRunIt5945DEE1": {
       "DeletionPolicy": "Retain",
@@ -881,64 +1049,6 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "Custom::StepFunctionTaskStep",
       "UpdateReplacePolicy": "Retain",
-    },
-    "StateMachineComponent": {
-      "Properties": {
-        "DefinitionString": "{
-  "StartAt": "MyPassState",
-  "States": {
-    "MyPassState": {
-      "Type": "Pass",
-      "Next": "Wait for 3 seconds"
-    },
-    "Wait for 3 seconds": {
-      "Seconds": 3,
-      "Type": "Wait",
-      "Next": "Convert HelloWorld to Base64"
-    },
-    "Convert HelloWorld to Base64": {
-      "Parameters": {
-        "FunctionName": "MyLambda",
-        "Payload": {
-          "input": "HelloWorld"
-        }
-      },
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Type": "Task",
-      "End": true,
-      "Retry": [
-        {
-          "ErrorEquals": [
-            "States.TaskFailed"
-          ],
-          "IntervalSeconds": 15,
-          "MaxAttempts": 2,
-          "BackoffRate": 4.0
-        }
-      ],
-      "Catch": [
-        {
-          "ErrorEquals": [
-            "States.TaskFailed"
-          ],
-          "Next": "LambdaTaskFailed"
-        }
-      ]
-    },
-    "LambdaTaskFailed": {
-      "Type": "Fail"
-    }
-  }
-}",
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "PyStepFunctionsImportSFRole7AFE3505",
-            "Arn",
-          ],
-        },
-        "StateMachineName": "MyWorkflow",
-      },
-      "Type": "AWS::StepFunctions::StateMachine",
     },
     "StepFunctionTaskStepResourcesStepFunctionTaskStepIsCompleteC615327A": {
       "DependsOn": [

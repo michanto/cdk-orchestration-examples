@@ -9,7 +9,7 @@ import { AwsCustomResource, PhysicalResourceId, AwsCustomResourcePolicy } from '
 import { Construct, IConstruct } from 'constructs';
 import { GreetingLambdaTask } from '../constructs/greeting_lambda_task';
 import { HitlTestStepFunctionDefinition } from '../constructs/hitl_test_step_fn';
-import { PyStepFunctionsImport } from '../constructs/py_step_functions_cleanup';
+import { ImportEchoInputStepFunction } from '../constructs/py_step_functions_cleanup';
 
 /**
  * You can't modify your CloudFormation template JSON if you can't find
@@ -148,7 +148,7 @@ export class FindingConstructs extends Stack {
      *
      * This construct creates a CfnInclude, which is a CfnElement.
      */
-    new PyStepFunctionsImport(this, 'PyStepFunctionsImport');
+    new ImportEchoInputStepFunction(this, 'PyStepFunctionsImport');
 
     new AwsCustomResource(this, 'MyS3FileResource', {
       onCreate: {

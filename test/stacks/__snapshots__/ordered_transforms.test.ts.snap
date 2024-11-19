@@ -2,130 +2,7 @@
 
 exports[`OrderedTransforms 1`] = `
 {
-  "Mappings": {
-    "LatestNodeRuntimeMap": {
-      "af-south-1": {
-        "value": "nodejs20.x",
-      },
-      "ap-east-1": {
-        "value": "nodejs20.x",
-      },
-      "ap-northeast-1": {
-        "value": "nodejs20.x",
-      },
-      "ap-northeast-2": {
-        "value": "nodejs20.x",
-      },
-      "ap-northeast-3": {
-        "value": "nodejs20.x",
-      },
-      "ap-south-1": {
-        "value": "nodejs20.x",
-      },
-      "ap-south-2": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-1": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-2": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-3": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-4": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-5": {
-        "value": "nodejs20.x",
-      },
-      "ap-southeast-7": {
-        "value": "nodejs20.x",
-      },
-      "ca-central-1": {
-        "value": "nodejs20.x",
-      },
-      "ca-west-1": {
-        "value": "nodejs20.x",
-      },
-      "cn-north-1": {
-        "value": "nodejs18.x",
-      },
-      "cn-northwest-1": {
-        "value": "nodejs18.x",
-      },
-      "eu-central-1": {
-        "value": "nodejs20.x",
-      },
-      "eu-central-2": {
-        "value": "nodejs20.x",
-      },
-      "eu-isoe-west-1": {
-        "value": "nodejs18.x",
-      },
-      "eu-north-1": {
-        "value": "nodejs20.x",
-      },
-      "eu-south-1": {
-        "value": "nodejs20.x",
-      },
-      "eu-south-2": {
-        "value": "nodejs20.x",
-      },
-      "eu-west-1": {
-        "value": "nodejs20.x",
-      },
-      "eu-west-2": {
-        "value": "nodejs20.x",
-      },
-      "eu-west-3": {
-        "value": "nodejs20.x",
-      },
-      "il-central-1": {
-        "value": "nodejs20.x",
-      },
-      "me-central-1": {
-        "value": "nodejs20.x",
-      },
-      "me-south-1": {
-        "value": "nodejs20.x",
-      },
-      "mx-central-1": {
-        "value": "nodejs20.x",
-      },
-      "sa-east-1": {
-        "value": "nodejs20.x",
-      },
-      "us-east-1": {
-        "value": "nodejs20.x",
-      },
-      "us-east-2": {
-        "value": "nodejs20.x",
-      },
-      "us-gov-east-1": {
-        "value": "nodejs18.x",
-      },
-      "us-gov-west-1": {
-        "value": "nodejs18.x",
-      },
-      "us-iso-east-1": {
-        "value": "nodejs18.x",
-      },
-      "us-iso-west-1": {
-        "value": "nodejs18.x",
-      },
-      "us-isob-east-1": {
-        "value": "nodejs18.x",
-      },
-      "us-west-1": {
-        "value": "nodejs20.x",
-      },
-      "us-west-2": {
-        "value": "nodejs20.x",
-      },
-    },
-  },
+  "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
     "BootstrapVersion": {
       "Default": "/cdk-bootstrap/hnb659fds/version",
@@ -134,336 +11,67 @@ exports[`OrderedTransforms 1`] = `
     },
   },
   "Resources": {
-    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76": {
-      "DependsOn": [
-        "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCERole685CF4F2",
+    "EchoStepFunction": {
+      "Properties": {
+        "DefinitionString": "{
+  "StartAt": "MyPassState",
+  "States": {
+    "MyPassState": {
+      "Type": "Pass",
+      "Next": "Wait for 3 seconds"
+    },
+    "Wait for 3 seconds": {
+      "Seconds": 3,
+      "Type": "Wait",
+      "Next": "Convert HelloWorld to Base64"
+    },
+    "Echo Input to Output": {
+      "Parameters": {
+        "FunctionName": "EchoInput",
+        "Payload": {
+          "input": "Hello, world!"
+        }
+      },
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Type": "Task",
+      "End": true,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 15,
+          "MaxAttempts": 2,
+          "BackoffRate": 4.0
+        }
       ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "3aa61e21c6891872655937328a6920a8bb2146166790237d55e789931f75b60c.zip",
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCERole685CF4F2",
-            "Arn",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
           ],
-        },
-        "Runtime": "nodejs20.x",
-        "Timeout": 120,
-      },
-      "Type": "AWS::Lambda::Function",
+          "Next": "LambdaTaskFailed"
+        }
+      ]
     },
-    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEvent4AE15604": {
-      "DependsOn": [
-        "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleDefaultPolicy9B953B1F",
-        "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleCBAF3CDB",
-      ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip",
-        },
-        "Description": "AWS CDK resource provider framework - onEvent (TransformsInfo/CDKORCHCUSTOMRESOURCE::Resources/CDKORCHCUSTOMRESOURCEProvider)",
-        "Environment": {
-          "Variables": {
-            "USER_ON_EVENT_FUNCTION_ARN": {
-              "Fn::GetAtt": [
-                "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76",
-                "Arn",
-              ],
-            },
-          },
-        },
-        "Handler": "framework.onEvent",
-        "Role": {
-          "Fn::GetAtt": [
-            "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleCBAF3CDB",
-            "Arn",
-          ],
-        },
-        "Runtime": {
-          "Fn::FindInMap": [
-            "LatestNodeRuntimeMap",
-            {
-              "Ref": "AWS::Region",
-            },
-            "value",
-          ],
-        },
-        "Timeout": 900,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleCBAF3CDB": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleDefaultPolicy9B953B1F": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": "lambda:InvokeFunction",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76",
-                          "Arn",
-                        ],
-                      },
-                      ":*",
-                    ],
-                  ],
-                },
-              ],
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleDefaultPolicy9B953B1F",
-        "Roles": [
-          {
-            "Ref": "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEventServiceRoleCBAF3CDB",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCERole685CF4F2": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "GreetingLambdaTask6113D194": {
-      "DeletionPolicy": "Delete",
-      "DependsOn": [
-        "GreetingLambdaTaskCustomResourcePolicyDC090EA0",
-      ],
-      "Properties": {
-        "EncodedProperties": {
-          "Fn::Base64": {
-            "Fn::Join": [
-              "",
-              [
-                "{"Create":{"service":"Lambda","action":"invoke","parameters":{"FunctionName":"",
-                {
-                  "Ref": "GreetingLambdaTaskReverse66C94AF9",
-                },
-                "","Payload":"{\\"Greeting\\":\\"Hello, everyone!\\"}"},"physicalResourceId":{"id":"Invoke",
-                {
-                  "Ref": "GreetingLambdaTaskReverse66C94AF9",
-                },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"Update":{"service":"Lambda","action":"invoke","parameters":{"FunctionName":"",
-                {
-                  "Ref": "GreetingLambdaTaskReverse66C94AF9",
-                },
-                "","Payload":"{\\"Greeting\\":\\"Hello, everyone!\\"}"},"physicalResourceId":{"id":"Invoke",
-                {
-                  "Ref": "GreetingLambdaTaskReverse66C94AF9",
-                },
-                "-c6ef627ecf342fd2e68e8caeb16b5314"}},"ResponseBufferField":"Payload","RequestedOutputs":[],"salt":1731294054943}",
-              ],
-            ],
-          },
-        },
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEvent4AE15604",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "Custom::LambdaTask",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "GreetingLambdaTaskCustomResourcePolicyDC090EA0": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": "lambda:Invoke",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "GreetingLambdaTaskCustomResourcePolicyDC090EA0",
-        "Roles": [
-          {
-            "Ref": "CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCERole685CF4F2",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "GreetingLambdaTaskReverse66C94AF9": {
-      "DependsOn": [
-        "GreetingLambdaTaskReverseServiceRoleE51874E3",
-      ],
-      "Properties": {
-        "Code": {
-          "ZipFile": ""use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.reverseGreeting = reverseGreeting;
-const logger = process.env.LogLevel ? console : undefined;
-function log(message) {
-logger === null || logger === void 0 ? void 0 : logger.log(JSON.stringify(message));
-}
-
-async function reverseGreeting(event, context) {
-var _a, _b;
-log({ Event: event });
-log({ Context: context });
-let isCustomResource = event.ResourceProperties != undefined;
-if (isCustomResource && 'EncodedProperties' in event.ResourceProperties) {
-event.ResourceProperties = {
-...event.ResourceProperties,
-...JSON.parse(Buffer.from(event.ResourceProperties.EncodedProperties, 'base64').toString('utf8')),
-};
-log({ DecodedEvent: JSON.stringify(event) });
-}
-let greeting = (_b = (_a = event.Greeting) !== null && _a !== void 0 ? _a : event.ResourceProperties.Greeting) !== null && _b !== void 0 ? _b : 'Hello, world';
-let result = greeting.split('').reverse().join('');
-return isCustomResource ? Promise.resolve({
-Data: { Greeting: result },
-}) : Promise.resolve({
-Greeting: result,
-});
+    "LambdaTaskFailed": {
+      "Type": "Fail"
+    }
+  }
 }",
-        },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
-        },
-        "Handler": "index.reverseGreeting",
-        "Role": {
+        "RoleArn": {
           "Fn::GetAtt": [
-            "GreetingLambdaTaskReverseServiceRoleE51874E3",
+            "ImportEchoInputSFRoleCFCF9D47",
             "Arn",
           ],
         },
-        "Runtime": "nodejs18.x",
+        "StateMachineName": "EchoInput",
       },
-      "Type": "AWS::Lambda::Function",
+      "Type": "AWS::StepFunctions::StateMachine",
     },
-    "GreetingLambdaTaskReverseServiceRoleE51874E3": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "HitlStepFunctionEchoLambda20867270": {
+    "ImportEchoInputEchoInputLambdaFD2F9CC0": {
       "DependsOn": [
-        "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1",
+        "ImportEchoInputEchoInputLambdaServiceRole8568B5AC",
       ],
       "Properties": {
         "Code": {
@@ -484,13 +92,13 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
         "Environment": {
           "Variables": {
             "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-            "LogLevel": "1",
           },
         },
+        "FunctionName": "EchoInput",
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1",
+            "ImportEchoInputEchoInputLambdaServiceRole8568B5AC",
             "Arn",
           ],
         },
@@ -498,7 +106,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::Lambda::Function",
     },
-    "HitlStepFunctionEchoLambdaServiceRoleFB48D8D1": {
+    "ImportEchoInputEchoInputLambdaServiceRole8568B5AC": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -529,39 +137,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "MockHitlStateMachine1D7D3E53": {
-      "DeletionPolicy": "Delete",
-      "DependsOn": [
-        "MockHitlStateMachineRoleDefaultPolicyB4C117F2",
-        "MockHitlStateMachineRole38B152A8",
-      ],
-      "Properties": {
-        "DefinitionString": {
-          "Fn::Join": [
-            "",
-            [
-              "{"StartAt":"AreRunsComplete?","States":{"AreRunsComplete?":{"Type":"Pass","Result":{"s3Uri":"s3://hitl-test-runs/runs/hitl-host-02/2024-05-10T10:38:27Z/15a85c7d-d7ca-43b4-906a-818488f39177","allRunsComplete":true,"allRunsSuccessful":true},"Next":"EchoStep"},"EchoStep":{"Next":"AreRunsSuccessful?","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","Resource":"",
-              {
-                "Fn::GetAtt": [
-                  "HitlStepFunctionEchoLambda20867270",
-                  "Arn",
-                ],
-              },
-              ""},"AreRunsSuccessful?":{"Type":"Choice","Choices":[{"And":[{"Variable":"$.allRunsComplete","BooleanEquals":true},{"Variable":"$.allRunsSuccessful","BooleanEquals":true}],"Next":"SucceedStep"}],"Default":"FailStep"},"FailStep":{"Type":"Fail","Comment":"All runs complete but not successful","CausePath":"States.JsonToString($)"},"SucceedStep":{"Type":"Succeed","Comment":"All runs complete and successful"}}}",
-            ],
-          ],
-        },
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "MockHitlStateMachineRole38B152A8",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::StepFunctions::StateMachine",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "MockHitlStateMachineRole38B152A8": {
+    "ImportEchoInputSFRoleCFCF9D47": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -578,7 +154,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
       },
       "Type": "AWS::IAM::Role",
     },
-    "MockHitlStateMachineRoleDefaultPolicyB4C117F2": {
+    "ImportEchoInputSFRoleDefaultPolicy4D60284E": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -588,7 +164,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "HitlStepFunctionEchoLambda20867270",
+                    "ImportEchoInputEchoInputLambdaFD2F9CC0",
                     "Arn",
                   ],
                 },
@@ -598,7 +174,7 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
                     [
                       {
                         "Fn::GetAtt": [
-                          "HitlStepFunctionEchoLambda20867270",
+                          "ImportEchoInputEchoInputLambdaFD2F9CC0",
                           "Arn",
                         ],
                       },
@@ -611,10 +187,10 @@ return Promise.resolve(event !== null && event !== void 0 ? event : {});
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "MockHitlStateMachineRoleDefaultPolicyB4C117F2",
+        "PolicyName": "ImportEchoInputSFRoleDefaultPolicy4D60284E",
         "Roles": [
           {
-            "Ref": "MockHitlStateMachineRole38B152A8",
+            "Ref": "ImportEchoInputSFRoleCFCF9D47",
           },
         ],
       },

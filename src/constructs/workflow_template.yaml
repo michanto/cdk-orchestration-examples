@@ -4,7 +4,7 @@ Resources:
   StateMachineComponent:
     Type: AWS::StepFunctions::StateMachine
     Properties:
-      StateMachineName: MyWorkflow
+      StateMachineName: EchoInput
       DefinitionString: |-
         {
           "StartAt": "MyPassState",
@@ -18,11 +18,11 @@ Resources:
               "Type": "Wait",
               "Next": "Convert HelloWorld to Base64"
             },
-            "Convert HelloWorld to Base64": {
+            "Echo Input to Output": {
               "Parameters": {
-                "FunctionName": "MyLambda",
+                "FunctionName": "EchoInput",
                 "Payload": {
-                  "input": "HelloWorld"
+                  "input": "Hello, world!"
                 }
               },
               "Resource": "arn:aws:states:::lambda:invoke",
@@ -52,4 +52,4 @@ Resources:
             }
           }
         }
-      RoleArn: arn:aws:iam::541289198167:role/MyRole
+      RoleArn: arn:aws:iam::111111111111:role/MyRole

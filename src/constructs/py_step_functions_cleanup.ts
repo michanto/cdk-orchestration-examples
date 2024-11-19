@@ -1,3 +1,4 @@
+import { InlineNodejsFunction } from '@michanto/cdk-orchestration/aws-lambda-nodejs';
 import { TemplateImporter } from '@michanto/cdk-orchestration/cloudformation-include';
 import { CfJsonType, StringReplacer, Transform } from '@michanto/cdk-orchestration/transforms';
 import { RemovalPolicy } from 'aws-cdk-lib';
@@ -5,19 +6,48 @@ import { IRole, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnStateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { Construct } from 'constructs';
 
+const LAMBDA_PATH = `${__dirname}/../../lib/constructs/lambdas/`;
+
+/**
+ * Removes the description from a template.
+ * Good for import scenarios so the Description doesn't make it into the Stack.
+ */
 export class DescriptionRemover extends Transform {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+  }
+
   public apply(template: CfJsonType): CfJsonType {
     delete template.Description;
     return template;
   }
 }
 
-export interface PyStepFunctionsCleanupProps {
+/** Sets the RoleArn property of StepFunction resources */
+export class StepFunctionRoleArn extends Transform {
+  constructor(scope: Construct, id: string, readonly role: IRole) {
+    super(scope, id);
+  }
+
+  apply(template: CfJsonType): CfJsonType {
+    for (let res in template.Resources) {
+      const resource = template.Resources[res];
+      if (template.Resources[res].Type == 'AWS::StepFunctions::StateMachine') {
+        resource.Properties.RoleArn =this.role.roleArn;
+      }
+    }
+    return template;
+  }
+
+}
+
+/** Properties for DataScienceSdkTemplateCleanup */
+export interface DataScienceSdkTemplateCleanupProps {
   /**
    * Desired logical id for the imported StateMachine.
    * The default logical id for PyStepFunction is 'StateMachineComponent',
    * but user can change it. */
-  resourceLogicalId?: string;
+  stepFunctionLogicalId?: string;
   /** Optionally add a role. */
   role?: IRole;
 }
@@ -28,37 +58,41 @@ export interface PyStepFunctionsCleanupProps {
  * https://docs.aws.amazon.com/step-functions/latest/dg/concepts-python-sdk.html)
  * and modifies it for import into a CDK stack.
  */
-export class PyStepFunctionsCleanup extends Transform {
+export class DataScienceSdkTemplateCleanup extends Construct {
   /** Default name for StepFunction created by Python SDK. */
   static readonly STATE_MACHINE_RESOURCE_ID = 'StateMachineComponent';
 
-  readonly stepFunctionResourceName;
-  constructor(scope: Construct, id: string, readonly props?: PyStepFunctionsCleanupProps) {
+  /**
+   * LogicalId for the imported StepFunction.
+   */
+  readonly stepFunctionLogicalId;
+
+  constructor(scope: Construct, id: string, readonly props?: DataScienceSdkTemplateCleanupProps) {
     super(scope, id);
+
     // If we don't delete this it gets put in the larger template.
+    // And the description is always the same and not useful.
     new DescriptionRemover(this, 'DescriptionRemover');
+
     // If the user desires a rename, add a StringReplacer transform to perform the rename.
-    this.stepFunctionResourceName = props?.resourceLogicalId ?? PyStepFunctionsCleanup.STATE_MACHINE_RESOURCE_ID;
-    if (props?.resourceLogicalId) {
+    this.stepFunctionLogicalId = props?.stepFunctionLogicalId ?? DataScienceSdkTemplateCleanup.STATE_MACHINE_RESOURCE_ID;
+    if (props?.stepFunctionLogicalId) {
       // Note that StringTransforms always run before Transforms,
       // unless the StringTransform.order is overridden.
-      new StringReplacer(scope, 'Replacer', {
-        joiner: props.resourceLogicalId,
-        splitter: PyStepFunctionsCleanup.STATE_MACHINE_RESOURCE_ID,
+      new StringReplacer(this, 'ReplaceLogicalId', {
+        joiner: props.stepFunctionLogicalId,
+        splitter: DataScienceSdkTemplateCleanup.STATE_MACHINE_RESOURCE_ID,
       });
     }
-  }
 
-  apply(template: any) {
-    let resource = template.Resources[this.stepFunctionResourceName];
-    if (resource && this.props?.role) {
-      resource.Properties.RoleArn =this.props!.role.roleArn;
+    if (props?.role) {
+      new StepFunctionRoleArn(this, 'StepFunctionRoleArn', props.role);
     }
-    return template;
   }
 }
 
-export interface PyStepFunctionsTemplateImportProps extends PyStepFunctionsCleanupProps {
+/** Properties for {@link DataScienceSdkTemplateImport} */
+export interface DataScienceSdkTemplateImportProps extends DataScienceSdkTemplateCleanupProps {
   /** File to import */
   readonly templateFile: string;
   /** Optionally add a removal policy */
@@ -70,19 +104,17 @@ export interface PyStepFunctionsTemplateImportProps extends PyStepFunctionsClean
  * [AWS Step Functions Data Science SDK for Python](
  * https://docs.aws.amazon.com/step-functions/latest/dg/concepts-python-sdk.html)
  * into a CDK stack.
- *
- * Import multiple tempales into the stack by
  */
-export class PyStepFunctionsTemplateImport extends Construct {
+export class DataScienceSdkTemplateImport extends Construct {
   readonly stateMachine: CfnStateMachine;
 
-  constructor(scope: Construct, id: string, props?: PyStepFunctionsTemplateImportProps) {
+  constructor(scope: Construct, id: string, props?: DataScienceSdkTemplateImportProps) {
     super(scope, id);
     let importer = new TemplateImporter(this, 'Importer');
-    let cleanup = new PyStepFunctionsCleanup(importer, 'Cleanup', props);
+    let cleanup = new DataScienceSdkTemplateCleanup(importer, 'Cleanup', props);
 
     this.stateMachine = importer.importTemplate(templateFileName)
-      .getResource(cleanup.stepFunctionResourceName) as CfnStateMachine;
+      .getResource(cleanup.stepFunctionLogicalId) as CfnStateMachine;
 
     if (props?.removalPolicy) {
       this.stateMachine.applyRemovalPolicy(props?.removalPolicy);
@@ -92,18 +124,27 @@ export class PyStepFunctionsTemplateImport extends Construct {
 
 const templateFileName = `${__dirname}/workflow_template.yaml`;
 
-export class PyStepFunctionsImport extends Construct {
-  readonly import: PyStepFunctionsTemplateImport;
-  constructor(scope: Construct, id: string, templateFile: string = templateFileName) {
+export class ImportEchoInputStepFunction extends Construct {
+  readonly import: DataScienceSdkTemplateImport;
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     let role = new Role(this, 'SFRole', {
       assumedBy: new ServicePrincipal('states.amazonaws.com'),
     });
 
-    this.import = new PyStepFunctionsTemplateImport(this, 'ImportPyStepFunction', {
-      templateFile: templateFile,
+    let echoFn = new InlineNodejsFunction(this, 'EchoInputLambda', {
+      entry: `${LAMBDA_PATH}/echo.js`,
+      functionName: 'EchoInput',
+    });
+    echoFn.grantInvoke(role);
+
+
+    this.import = new DataScienceSdkTemplateImport(this, 'DataScienceSdkTemplateImport', {
+      templateFile: `${__dirname}/workflow_template.yaml`,
+      stepFunctionLogicalId: 'EchoStepFunction',
       role: role,
     });
   }
 }
+
