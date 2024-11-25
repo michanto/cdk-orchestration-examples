@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import { ImportEchoInputStepFunction } from '../constructs/py_step_functions_cleanup';
 
 export class OrderedTransforms extends Stack {
-  constructor(scope: Construct, id: string = 'TransformsInfo', props?: StackProps) {
+  constructor(scope: Construct, id: string = 'OrderedTransforms', props?: StackProps) {
     super(scope, id, props);
     console.log('OrderedTransforms constructor BEGIN');
     Logger.set(this, new Logger({ logLevel: LogLevel.DEBUG }));

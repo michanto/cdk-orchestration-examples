@@ -26,21 +26,21 @@ export class EchoCustomResourceAfterEncode extends EchoCustomResource {
   }
 }
 
-export class Base64EncodingExample extends Stack {
-  constructor(scope: Construct, id: string = 'TransformsInfo', props?: StackProps) {
+export class Base64Encoding extends Stack {
+  constructor(scope: Construct, id: string = 'Base64Encoding', props?: StackProps) {
     super(scope, id, props);
-    console.log('OrderedTransforms constructor BEGIN');
+    console.log('Base64Encoding constructor BEGIN');
     Logger.set(this, new Logger({ logLevel: LogLevel.DEBUG }));
 
     /**
      * Similar to CDK Triggers, LambdaTask classes are custom resources that call a lambda.
      */
     let task = new GreetingLambdaTask(this, 'GreetingLambdaTask', {
-      greeting: 'Hello, everyone!',
+      greeting: 'Hello, Frodo my lad!',
     });
     new EchoCustomResource(task, 'EchoCustomResource');
     new EchoCustomResourceAfterEncode(task, 'EchoCustomResourceAfterEncode');
 
-    console.log('OrderedTransforms constructor END');
+    console.log('Base64Encoding constructor END');
   }
 }
