@@ -1,12 +1,10 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { NormalizeSnapshot } from '../../src/constructs/normalize_snapshot';
-import { EscapeHatches } from '../../src/stacks/escape_hatches';
+import { NormalizeSnapshotExample } from '../../src/stacks/normalize_snapshot_example';
 
 test('EscapeHatches', () => {
   const app = new App();
-  const stack = new EscapeHatches(app);
-  new NormalizeSnapshot(stack);
+  const stack = new NormalizeSnapshotExample(app);
   const template = Template.fromStack(stack);
   expect(template.toJSON()).toMatchSnapshot();
 });

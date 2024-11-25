@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { NormalizeSnapshot } from '../../src/constructs/normalize_snapshot';
 import { StackProvenanceExample } from '../../src/stacks/stack_provenance';
-import { NormalizeSnapshot } from '../test_utils';
 
 test('StackProvenanceExample', () => {
   const app = new App();

@@ -1,7 +1,7 @@
 import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { NormalizeSnapshot } from '../../src/constructs/normalize_snapshot';
 import { OrderedTransforms } from '../../src/stacks/ordered_transforms';
-import { NormalizeSnapshot } from '../test_utils';
 
 test('OrderedTransforms', () => {
   const app = new App();
