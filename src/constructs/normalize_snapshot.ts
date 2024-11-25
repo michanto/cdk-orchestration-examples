@@ -50,11 +50,11 @@ export class NormalizeCodeS3Key extends Transform {
 /**
  * Salt value changes every build to the new BUILD_TIME.
  *
- * Freeze it to a constant value.
+ * Freeze it (and other uses of BUILD_TIME) to a constant value.
  */
 export class NormalizeSalt extends StringReplacer {
-  constructor(stack: Stack, id: string = 'NormalizeSalt') {
-    super(stack, id, {
+  constructor(scope: Construct, id: string = 'NormalizeSalt') {
+    super(scope, id, {
       splitter: BUILD_TIME.toString(), joiner: '1731294054943',
     });
   }
@@ -63,12 +63,16 @@ export class NormalizeSalt extends StringReplacer {
 /**
  * Freeze values we expect to change in snapshots.  That way the snapshots won't change due to
  * expected changes.
+ *
+ * Freezing is done by Transforms.  Since there are no L1 resoruces under NormalizeSnapshot,
+ * the Transforms are applied to the Stack.
  */
 export class NormalizeSnapshot extends Construct {
   constructor(stack: Stack, id: string = 'NormalizeSnapshot') {
     super(stack, id);
-    new NormalizeCodeS3Key(stack);
-    new NormalizeSalt(stack);
-    new NormalizeEnsureChangeInStack(stack);
+
+    new NormalizeCodeS3Key(this);
+    new NormalizeSalt(this);
+    new NormalizeEnsureChangeInStack(this);
   }
 }
