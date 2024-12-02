@@ -6,6 +6,9 @@ import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 /**
+ * Stack for video [Tokens! Tokens!
+ * Tokens!](https://www.youtube.com/watch?v=b2ImiKksbS0).
+ *
  * In this lesson we learn:
  * - How to name buckets using tokens.
  * - How buckets use tokens to reference the bucket name.

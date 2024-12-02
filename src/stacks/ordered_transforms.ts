@@ -3,6 +3,10 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { ImportEchoInputStepFunction } from '../constructs/py_step_functions_cleanup';
 
+/**
+ * Stack for video [Importing CloudFormation with Ordered
+ * Transforms](https://www.youtube.com/watch?v=QbzQ3ybG2s0)
+ */
 export class OrderedTransforms extends Stack {
   constructor(scope: Construct, id: string = 'OrderedTransforms', props?: StackProps) {
     super(scope, id, props);
