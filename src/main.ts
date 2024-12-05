@@ -1,6 +1,6 @@
 import { ServiceInspectorAspect } from '@michanto/cdk-orchestration';
 import { App, Aspects } from 'aws-cdk-lib';
-import { NormalizeSnapshotExample } from './stacks/normalize_snapshot_example';
+import { Base64Encoding } from './stacks/base64_encoding';
 
 // For development, use account/region from cdk cli
 // if not available, use dummy account/region for demo.
@@ -14,6 +14,6 @@ const app = new App();
 Aspects.of(app).add(new ServiceInspectorAspect());
 
 
-new NormalizeSnapshotExample(app, 'NormalizeSnapshotExample', { env: devEnv });
+new Base64Encoding(app, 'Base64Encoding', { env: devEnv });
 
 app.synth();
