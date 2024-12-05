@@ -8,7 +8,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   buildCommand: 'tsc', // For InlineNodejsFunction support.
   projenrcTs: true,
   deps: [
-    '@michanto/cdk-orchestration@^0.1.29',
+    '@michanto/cdk-orchestration@^0.1.30',
     'esbuild@^0.21.5',
   ], /* Runtime dependencies of this module. */
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
