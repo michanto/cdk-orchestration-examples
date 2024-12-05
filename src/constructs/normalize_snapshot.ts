@@ -36,13 +36,32 @@ export class NormalizeCodeS3Key extends Transform {
     super(scope, id);
   }
 
-  apply(template: CfJsonType): CfJsonType {
-
-    if (template.Resources.CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76) {
-      template.Resources.CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76
-        .Properties.Code.S3Key =
-          '3aa61e21c6891872655937328a6920a8bb2146166790237d55e789931f75b60c.zip';
+  protected setS3KeyOfResource(template: CfJsonType, logicalId: string, s3Key: string) {
+    if (template.Resources[logicalId]) {
+      template.Resources[logicalId]
+        .Properties.Code.S3Key = s3Key;
     }
+  }
+
+  apply(template: CfJsonType): CfJsonType {
+    this.setS3KeyOfResource(template,
+      'AWSCDKTriggerCustomResourceProviderCustomResourceProviderHandler97BECD91',
+      'fe27a81f1e8702187a8717117fe7516f45948616ac25cefe80cc7e202365594b.zip');
+    this.setS3KeyOfResource(template,
+      'CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEOnEventB60C9E76',
+      '3aa61e21c6891872655937328a6920a8bb2146166790237d55e789931f75b60c.zip');
+    this.setS3KeyOfResource(template,
+      'CDKORCHCUSTOMRESOURCEResourcesCDKORCHCUSTOMRESOURCEProviderframeworkonEvent4AE15604',
+      '4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip');
+    this.setS3KeyOfResource(template,
+      'StepFunctionTaskStepResourcesStepFunctionTaskStepProviderframeworkonEvent9D2C3EB6',
+      '4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip');
+    this.setS3KeyOfResource(template,
+      'StepFunctionTaskStepResourcesStepFunctionTaskStepProviderframeworkonTimeoutB0C276CE',
+      '4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip');
+    this.setS3KeyOfResource(template,
+      'StepFunctionTaskStepResourcesStepFunctionTaskStepProviderframeworkisComplete48653344',
+      '4dc48ffba382f93077a1e6824599bbd4ceb6f91eb3d9442eca3b85bdb1a20b1e.zip');
     return template;
   }
 }
